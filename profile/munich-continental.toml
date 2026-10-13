@@ -1,0 +1,167 @@
+nazwa = "Munich Continental"
+marka = "Munich"
+model = "Continental"
+rozmiar = "41"
+aliasy_marki = ["munchen"]
+opis_wykluczen = "bez V2 i Premium"
+
+frazy = ["munich continental", "halowki munich continental", "halowki munich"]
+
+wykluczenia = [
+    'continental\s*-?\s*v\s*-?\s*2',
+    '\bv\s?2\b',
+    'continental\s*(?:ii|2)\b',
+    'premium',
+]
+kody_modelu = ['(?<!\d)4100\d{3}(?!\d)']
+kody_wykluczone = ['(?<!\d)(?:4104|4770)\d{3}(?!\d)', '(?<!\d)8105\d{3}(?!\d)']
+inne_modele_marki = [
+    "gresca", "rondo", "rondito", "g-3", "g3 ", "profit", "hooper", "mundial", "arenga", "tiga",
+    "barru", "doro", "massana", "dash", "estadio", "debut", "oxygen", "prisma", "olympix", "x-ice",
+    "osaka", "indra", "nebula", "clip ",
+]
+nie_dotyczy = ['\bopon', 'contact\b', '\btyres?\b', '\breifen']
+slowa_kategorii = [
+    'halow', 'halowk', 'na hal', 'futsal', 'indoor', 'futbol sala', 'futbito', 'sala\b',
+    'dvoran', 'terem', 'hallen', 'zaal', 'salowe', 'hala\b',
+]
+wskazowka_zdjec = "klasyczny Continental: skóra lub zamsz, duży znak X; V2: syntetyk i mikrofibra"
+
+[[wskazowki]]
+wzorzec = 'syntet|mikrofib|microfib|poliester|polyester|sintetic'
+oprocz = 'naturaln'
+werdykt = "odrzuc"
+opis = "materiał syntetyczny w opisie, typowy dla V2"
+
+[[wskazowki]]
+wzorzec = 'skor[ay]|skorzan|zamsz|leather|suede|\bpiel\b|kangur|kangaroo|canguro|\bkoza\b'
+werdykt = "sprawdz"
+opis = "skóra lub zamsz w opisie, typowe dla klasycznego Continentala"
+
+[vinted]
+marka_id = 173430
+katalog_obuwia = 1231
+rozmiary = { "41" = 782 }
+
+[olx]
+zapytania = [
+    ["munich-continental", 2],
+    ["halowki-munich-continental", 1],
+    ["halowki-munich", 1],
+    ["munich-continental-{rozmiar}", 1],
+]
+
+[allegro_lokalnie]
+frazy = ["munich continental", "halowki munich continental", "halowki munich"]
+
+[ceneo]
+frazy = ["munich continental", "halowki munich continental"]
+
+[ebay]
+zapytanie = "munich continental"
+kategorie = ["15709", "109133"]
+
+[futbolemotion]
+zapytanie = "munich continental"
+
+[rgol]
+zapytanie = "munich"
+
+[goalinn]
+lista = "https://www.tradeinn.com/goalinn/pl/buty-buty-pi%C5%82karskie-halowki/munich/11002-629/sm"
+
+[odkrywanie]
+frazy = [
+    ["munich continental {rozmiar}", "pl", "pl"],
+    ["halówki munich continental", "pl", "pl"],
+    ["zapatillas munich continental {rozmiar}", "es", "es"],
+    ["munich continental hallenschuhe {rozmiar}", "de", "de"],
+    ["scarpe munich continental {rozmiar}", "it", "it"],
+    ["chaussures munich continental {rozmiar}", "fr", "fr"],
+    ["munich continental indoor football shoes {rozmiar}", "uk", "en"],
+]
+
+[minimalne_odczyty]
+"Vinted" = 10
+"OLX" = 20
+"Goalinn" = 50
+"Fútbol Emotion" = 3
+"R-GOL" = 3
+"Ceneo" = 2
+"Munich (oficjalny)" = 5
+"Revealsport" = 2
+"Redbox" = 1
+"Sport-Shop" = 1
+
+[[sklep]]
+nazwa = "Munich (oficjalny)"
+lista = "https://www.munichsports.com/en/search?q=continental"
+wzor_linku = '^https://www\.munichsports\.com/(?:[a-z]{2}/)?[a-z0-9-]*continental[a-z0-9-]*-\d{6,8}(?:-[a-z]{2})?$'
+wysylka = "sprawdź w koszyku (sklep z Hiszpanii)"
+max_produktow = 10
+
+[[sklep]]
+nazwa = "Sportano"
+lista = "https://sportano.pl/catalogsearch/result/?q={fraza_url}"
+wzor_linku = '^https://sportano\.pl/p/\d+/[^?#]+$'
+
+[[sklep]]
+nazwa = "Revealsport"
+lista = "https://revealsport.pl/szukaj?controller=search&s={fraza_url}"
+wzor_linku = '^https://revealsport\.pl/[a-z0-9-]+/\d+[^?#]*\.html$'
+
+[[sklep]]
+nazwa = "Redbox"
+lista = "https://redbox.pl/continental-306"
+wzor_linku = '^https://redbox\.pl/[a-z0-9-]+/\d+-[^?#]*\.html$'
+
+[[sklep]]
+nazwa = "Sport-Shop"
+lista = "https://www.sport-shop.pl/buty-halowki-munich-c-694,2113.html"
+wzor_linku = '^https://www\.sport-shop\.pl/[^?#]+-p-\d+\.html$'
+
+[[sklep]]
+nazwa = "Vitasport"
+lista = "https://www.vitasport.pl/buty/marki/munich"
+wzor_linku = '^https://www\.vitasport\.pl/[^?#]+$'
+
+[[sklep]]
+nazwa = "Gain Control"
+lista = "https://gaincontrol.pl/?s={fraza_url}&post_type=product"
+wzor_linku = '^https://gaincontrol\.pl/[^?#]+$'
+
+[[reczny]]
+nazwa = "Allegro"
+url = "https://allegro.pl/listing?string={fraza_z_rozmiarem_url}&order=p"
+opis = "chronione przez DataDome, otwórz ręcznie (posortowane od najtańszych)"
+
+[[reczny]]
+nazwa = "eBay"
+url = "https://www.ebay.de/sch/i.html?_nkw={fraza_z_rozmiarem_url}&_sop=15"
+opis = "dodaj klucz eBay API do .env, a eBay będzie przeszukiwany automatycznie"
+bez_klucza = "ebay"
+
+[[reczny]]
+nazwa = "Decathlon"
+url = "https://www.decathlon.pl/search?Ntt={fraza_url}"
+opis = "chroniony przez Cloudflare, sprzedaje Continental (ok. 320 zł)"
+
+[[reczny]]
+nazwa = "Zalando"
+url = "https://www.zalando.pl/katalog/?q={fraza_url}"
+opis = "chronione przez Akamai"
+
+[[reczny]]
+nazwa = "Sport Center Cesena"
+url = "https://www.sportcentercesena.com/catalogsearch/result/?q={fraza_url}"
+opis = "włoski sklep chroniony przez Cloudflare, bywa tani (Continental 958 ok. 90 €), wysyłkę do PL sprawdź w koszyku"
+
+[[reczny]]
+nazwa = "Amazon"
+url = "https://www.amazon.pl/s?k={fraza_z_rozmiarem_url}"
+opis = "Amazon blokuje automaty, sprawdź też amazon.de i amazon.es"
+
+[[reczny]]
+nazwa = "Google Zakupy"
+url = "https://www.google.com/search?tbm=shop&q={fraza_z_rozmiarem_url}"
+opis = "szeroki przegląd sklepów z całej Europy"
