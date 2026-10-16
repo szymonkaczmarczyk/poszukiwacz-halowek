@@ -1,0 +1,85 @@
+:root {
+  color-scheme: dark;
+
+  --kolor-tlo: #0e0e10;
+  --kolor-tlo-uniesione: #141417;
+  --kolor-powierzchnia: #1a1a1e;
+  --kolor-powierzchnia-aktywna: #212228;
+  --kolor-linia: #2a2b31;
+  --kolor-linia-mocna: #3e4049;
+  --kolor-tekst: #f3f1ec;
+  --kolor-tekst-drugi: #aeaca6;
+  --kolor-tekst-trzeci: #85837d;
+  --kolor-akcent: #6e95ff;
+  --kolor-akcent-mocny: #8eadff;
+  --kolor-akcent-tekst: #0a0c12;
+  --kolor-akcent-tlo: rgb(110 149 255 / 0.12);
+  --kolor-akcent-poswiata: rgb(110 149 255 / 0.22);
+  --kolor-sukces: #45d19a;
+  --kolor-sukces-tlo: rgb(69 209 154 / 0.12);
+  --kolor-ostrzezenie: #f2c94c;
+  --kolor-ostrzezenie-tlo: rgb(242 201 76 / 0.12);
+  --kolor-blad: #ff7a7a;
+  --kolor-blad-tlo: rgb(255 122 122 / 0.12);
+  --kolor-swiatlo: rgb(243 241 236 / 0.07);
+
+  --odstep-1: 4px;
+  --odstep-2: 8px;
+  --odstep-3: 12px;
+  --odstep-4: 16px;
+  --odstep-5: 24px;
+  --odstep-6: 32px;
+  --odstep-7: 48px;
+  --odstep-8: 64px;
+  --odstep-9: 96px;
+  --odstep-10: 128px;
+
+  --promien-maly: 6px;
+  --promien: 10px;
+  --promien-duzy: 16px;
+
+  --font: "DM Sans Variable", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --rozmiar-h1: 44px;
+  --rozmiar-h2: 32px;
+  --rozmiar-h3: 28px;
+  --rozmiar-h4: 18px;
+  --rozmiar-body-large: 16px;
+  --rozmiar-body: 16px;
+  --rozmiar-maly: 14px;
+  --rozmiar-podpis: 13px;
+  --interlinia-body: 1.6;
+  --interlinia-naglowek: 1.05;
+  --tracking-body: -0.02em;
+  --tracking-naglowek: -0.06em;
+  --tracking-wersaliki: 0.01em;
+
+  --cel-dotyku: 44px;
+  --szerokosc-tekstu: 60ch;
+  --wysokosc-naglowka: 64px;
+  --wysokosc-paska: 88px;
+  --szerokosc-sceny: 40vw;
+
+  --czas-szybki: 160ms;
+  --czas: 280ms;
+  --czas-wolny: 520ms;
+  --krzywa: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --krzywa-wyjscie: cubic-bezier(0.4, 0, 1, 1);
+
+  --cien-uniesienia: 0 18px 40px -24px rgb(0 0 0 / 0.8);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --rozmiar-h1: 64px;
+    --rozmiar-h2: 56px;
+    --rozmiar-h3: 32px;
+    --rozmiar-h4: 20px;
+    --rozmiar-body-large: 18px;
+  }
+}
+
+@media (min-width: 1280px) {
+  :root {
+    --rozmiar-h1: 80px;
+  }
+}

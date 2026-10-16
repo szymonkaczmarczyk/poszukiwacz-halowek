@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0e0e10">
+<title>Szatnia - halówki w Twoim rozmiarze od najtańszej oferty</title>
+<meta name="description" content="Wybierz markę, model i rozmiar halówek od 38 do 46. Szatnia sprawdza Vinted, OLX, Ceneo i sklepy z wysyłką do Polski i układa oferty od najtańszej.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="pl_PL">
+<meta property="og:site_name" content="Szatnia">
+<meta property="og:title" content="Szatnia - halówki w Twoim rozmiarze od najtańszej oferty">
+<meta property="og:description" content="Wybierz markę, model i rozmiar halówek od 38 do 46. Szatnia sprawdza Vinted, OLX, Ceneo i sklepy z wysyłką do Polski i układa oferty od najtańszej.">
+<meta property="og:image" content="/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Stylizowany biały but halowy obok napisu: Halówki w Twoim rozmiarze, od najtańszej oferty">
+<meta name="twitter:card" content="summary_large_image">
+<meta property="og:url" content="/">
+<script type="module" src="/src/main.js"></script>
+</head>
+<body class="strona-glowna">
+<a class="przeskok" href="#krok-marka">Przejdź do wyboru buta</a>
+
+<header class="naglowek">
+  <a class="logo" href="#start" aria-label="Szatnia, początek strony">Szatnia</a>
+  <div class="naglowek__akcje">
+    <span class="status-api" id="status-api" role="status" aria-live="polite">
+      <span class="kropka" aria-hidden="true"></span><span class="status-api__tekst">Łączę z serwerem…</span>
+    </span>
+  </div>
+</header>
+
+<nav class="szyna" aria-label="Kroki wyboru">
+  <ol>
+    <li><a href="#krok-marka" data-krok="marka"><span class="szyna__nr">01</span><span class="szyna__nazwa">Marka</span></a></li>
+    <li><a href="#krok-model" data-krok="model"><span class="szyna__nr">02</span><span class="szyna__nazwa">Model</span></a></li>
+    <li><a href="#krok-rozmiar" data-krok="rozmiar"><span class="szyna__nr">03</span><span class="szyna__nazwa">Rozmiar</span></a></li>
+    <li><a href="#krok-filtry" data-krok="filtry"><span class="szyna__nr">04</span><span class="szyna__nazwa">Filtry</span></a></li>
+  </ol>
+</nav>
+
+<div class="scena" aria-hidden="true">
+  <div class="scena__swiatlo"></div>
+  <p class="scena__marka" id="scena-marka">Szatnia</p>
+  <svg class="scena__but" viewBox="0 0 400 200" focusable="false">
+    <path class="scena__cholewka" d="M40 168 L40 120 Q40 92 62 88 L112 82 Q128 96 150 96 L176 70 Q190 66 200 76 L300 112 Q352 124 368 148 Q374 160 366 170 L40 170 Z"/>
+    <path class="scena__sznurowka" d="M186 84 L292 120 M204 96 L218 82 M226 104 L240 90 M248 111 L262 97 M270 118 L284 104"/>
+    <path class="scena__podeszwa" d="M36 170 L370 170 L368 182 Q366 188 358 188 L46 188 Q36 188 36 178 Z"/>
+  </svg>
+  <p class="scena__podpis"><span id="scena-model">Wybierz but</span><span id="scena-rozmiar"></span></p>
+</div>
+
+<main id="start">
+  <section class="hero" aria-labelledby="hero-tytul">
+    <p class="nadtytul">Wyszukiwarka halówek</p>
+    <h1 id="hero-tytul">Halówki w Twoim rozmiarze, od najtańszej oferty</h1>
+    <p class="hero__opis" id="hero-opis">Wybierz markę, model i rozmiar od 38 do 46. Szatnia sprawdzi Vinted, OLX, Ceneo i sklepy z wysyłką do Polski, a potem ułoży oferty od najtańszej z dostawą.</p>
+    <div class="hero__akcje">
+      <a class="przycisk przycisk--glowny" href="#krok-marka" data-przewin>Wybierz but<span data-ikona="ArrowDown"></span></a>
+    </div>
+    <dl class="hero__liczby" id="hero-liczby" hidden>
+      <div><dt>marek</dt><dd id="liczba-marek"></dd></div>
+      <div><dt>modeli</dt><dd id="liczba-modeli"></dd></div>
+      <div><dt>rozmiary</dt><dd id="zakres-rozmiarow"></dd></div>
+    </dl>
+  </section>
+
+  <section class="krok" id="krok-marka" data-krok="marka" aria-labelledby="marka-tytul">
+    <p class="krok__nr">Krok 1 z 4</p>
+    <h2 id="marka-tytul">Marka</h2>
+    <p class="krok__opis">Sześć marek, które robią halówki na serio. Wybierz jedną, a pokażę jej modele.</p>
+    <div class="siatka-marek" id="lista-marek" role="radiogroup" aria-labelledby="marka-tytul" aria-busy="true"></div>
+  </section>
+
+  <section class="krok" id="krok-model" data-krok="model" aria-labelledby="model-tytul">
+    <p class="krok__nr">Krok 2 z 4</p>
+    <h2 id="model-tytul">Model</h2>
+    <p class="krok__opis" id="model-opis">Każdy model ma własne reguły: program odrzuca podobne wersje, turfy i rozmiary dziecięce.</p>
+    <div class="lista-modeli" id="lista-modeli" role="radiogroup" aria-labelledby="model-tytul"></div>
+  </section>
+
+  <section class="krok" id="krok-rozmiar" data-krok="rozmiar" aria-labelledby="rozmiar-tytul">
+    <p class="krok__nr">Krok 3 z 4</p>
+    <h2 id="rozmiar-tytul">Rozmiar</h2>
+    <p class="krok__opis">Rozmiar EU. Możesz zaznaczyć kilka, np. gdy model jest wąski i nosisz pół numeru więcej.</p>
+    <div class="rozmiary" id="lista-rozmiarow" role="group" aria-labelledby="rozmiar-tytul" aria-describedby="rozmiar-podpowiedz"></div>
+    <p class="podpowiedz" id="rozmiar-podpowiedz"></p>
+  </section>
+
+  <section class="krok" id="krok-filtry" data-krok="filtry" aria-labelledby="filtry-tytul">
+    <p class="krok__nr">Krok 4 z 4</p>
+    <h2 id="filtry-tytul">Filtry</h2>
+    <p class="krok__opis">Wszystko opcjonalne. Bez zmian dostaniesz pełną listę ze wszystkich dostępnych źródeł.</p>
+    <div class="filtry" id="filtry"></div>
+  </section>
+
+  <section class="postep" id="postep" aria-labelledby="postep-tytul" hidden>
+    <p class="krok__nr" id="postep-nr">Wyszukiwanie</p>
+    <h2 id="postep-tytul" tabindex="-1">Szukam ofert</h2>
+    <p class="krok__opis" id="postep-opis" role="status" aria-live="polite"></p>
+    <div class="postep__akcje">
+      <button class="przycisk" id="przerwij" type="button" aria-keyshortcuts="Escape" hidden><span data-ikona="Square"></span>Przerwij szukanie<kbd class="skrot skrot--jasny">Esc</kbd></button>
+      <div class="pasek-postepu" id="pasek-postepu" role="progressbar" aria-label="Sprawdzone źródła" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span></span></div>
+    </div>
+    <ol class="zrodla-postep" id="zrodla-postep"></ol>
+    <div class="wyniki" id="wyniki"></div>
+  </section>
+</main>
+
+<footer class="stopka">
+  <p>Szatnia, wyszukiwarka halówek działająca na Twoim komputerze.</p>
+  <nav aria-label="Informacje">
+    <a href="/polityka-prywatnosci.html">Polityka prywatności</a>
+    <a href="/regulamin.html">Regulamin</a>
+  </nav>
+</footer>
+
+<aside class="pasek" id="pasek" aria-label="Podsumowanie wyboru">
+  <div class="pasek__wybor" id="pasek-wybor"></div>
+  <p class="pasek__brak" id="pasek-brak"></p>
+  <button class="przycisk przycisk--glowny" id="szukaj" type="button" aria-keyshortcuts="Control+Enter Meta+Enter">
+    <span data-ikona="Search"></span>Szukaj ofert<kbd class="skrot" id="skrot">Ctrl&nbsp;↵</kbd>
+  </button>
+</aside>
+<div class="powiadomienia" id="powiadomienia" aria-live="polite"></div>
+</body>
+</html>

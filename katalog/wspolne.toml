@@ -1,0 +1,28 @@
+rozmiary = ["38", "39", "40", "41", "42", "43", "44", "45", "46"]
+
+slowa_kategorii = [
+    'halow', 'halowk', 'na hal', 'futsal', 'indoor', 'futbol sala', 'futbito', 'sala\b',
+    'dvoran', 'terem', 'hallen', 'zaal', 'salowe', 'hala\b',
+]
+
+[vinted]
+katalog_obuwia = 1231
+rozmiary = { "38" = 776, "39" = 778, "40" = 780, "41" = 782, "42" = 784, "43" = 786, "44" = 788, "45" = 790, "46" = 792 }
+
+[ebay]
+kategorie = ["15709", "109133"]
+
+[[sklep]]
+nazwa = "Sportano"
+lista = "https://sportano.pl/catalogsearch/result/?q={fraza_url}"
+wzor_linku = '^https://sportano\.pl/p/\d+/[^?#]+$'
+
+[[sklep]]
+nazwa = "Revealsport"
+lista = "https://revealsport.pl/szukaj?controller=search&s={fraza_url}"
+wzor_linku = '^https://revealsport\.pl/[a-z0-9-]+/\d+[^?#]*\.html$'
+
+[[sklep]]
+nazwa = "Gain Control"
+lista = "https://gaincontrol.pl/?s={fraza_url}&post_type=product"
+wzor_linku = '^https://gaincontrol\.pl/[^?#]+$'

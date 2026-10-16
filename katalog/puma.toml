@@ -1,0 +1,27 @@
+marka = "Puma"
+opis_wykluczen = "tylko wersje halowe (IT), bez korków i turfów"
+wykluczenia = ['\bfg\b', '\bag\b', '\bsg\b', '\bmg\b', '\btt\b', '\btf\b', 'turf']
+oznaczenia_hali = ['\bit\b', '\bic\b', 'indoor', 'halow', 'na hal', 'futsal', 'sala\b', 'hallen', 'zaal', 'salle']
+
+[[model]]
+id = "truco"
+model = "Truco"
+oznaczenia_hali = []
+
+[[model]]
+id = "future"
+model = "Future"
+nazwa = "Puma Future IT"
+frazy = ["puma future it", "halowki puma future"]
+
+[[model]]
+id = "ultra"
+model = "Ultra"
+nazwa = "Puma Ultra IT"
+frazy = ["puma ultra it", "halowki puma ultra"]
+
+[[model]]
+id = "king"
+model = "King"
+nazwa = "Puma King IT"
+frazy = ["puma king it", "halowki puma king"]

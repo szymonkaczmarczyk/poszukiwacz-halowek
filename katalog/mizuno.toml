@@ -1,0 +1,11 @@
+marka = "Mizuno"
+opis_wykluczen = "bez wersji TF i korków"
+wykluczenia = ['\bfg\b', '\bag\b', '\btf\b', 'turf']
+
+[[model]]
+id = "morelia-sala"
+model = "Morelia Sala"
+
+[[model]]
+id = "monarcida-sala"
+model = "Monarcida Sala"

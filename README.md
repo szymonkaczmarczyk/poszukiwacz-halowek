@@ -2,10 +2,16 @@
 
 Szuka wybranego modelu butów w podanym rozmiarze w sklepach i na marketplace'ach z wysyłką do Polski. Wyniki sortuje od najtańszych, a ceny w euro przelicza po kursie NBP.
 
-Co i w jakim rozmiarze szukać, opisuje **profil**: plik `.toml` w katalogu `profile/`. W zestawie są dwa:
+Co szukać, wybierasz z **katalogu modeli** (`katalog/`): marka, model i rozmiar od 38 do 46. W katalogu są halówki sześciu marek:
 
-* `munich-continental.toml`: halówki Munich Continental 41, bez V2 i Premium (profil domyślny)
-* `joma-top-flex.toml`: halówki Joma Top Flex 42, bez Rebound i wersji dziecięcej
+* Munich: Continental, Continental V2, Gresca, G-3, Arenga, Tiga, Prisma, Oxygen
+* Joma: Top Flex, Top Flex Rebound, Mundial, Dribling, Invicto, Liga 5, FS Reactive, Regate Rebound, Maxima, Cancha
+* Nike: Tiempo, Phantom, Mercurial Vapor, Mercurial Superfly (wersje IC), Lunar Gato II, Streetgato, React Gato
+* Adidas: Top Sala, Super Sala, Predator, Copa, F50 (wersje IN)
+* Puma: Truco, Future, Ultra, King (wersje IT)
+* Mizuno: Morelia Sala, Monarcida Sala
+
+Domyślnie program szuka Munich Continental w rozmiarze 41.
 
 ## Uruchomienie
 
@@ -18,18 +24,24 @@ py szukaj.py
 ```
 
 ```bash
-py szukaj.py --profil profile/joma-top-flex.toml
+py szukaj.py --marka joma --model top-flex --rozmiar 42
 ```
 
-Po zakończeniu w terminalu pojawia się lista z linkami, a w przeglądarce otwiera się raport `wyniki/<profil>/raport.html` z filtrami. Te same dane trafiają też do `oferty.csv` (Excel) i `oferty.json` w tym samym katalogu.
+```bash
+py szukaj.py --lista-modeli
+```
+
+Po zakończeniu w terminalu pojawia się lista z linkami, a w przeglądarce otwiera się raport `wyniki/<marka>-<model>/<rozmiar>/raport.html` z filtrami. Te same dane trafiają też do `oferty.csv` (Excel) i `oferty.json` w tym samym katalogu.
 
 Przydatne opcje:
 
 | Opcja | Działanie |
 |---|---|
-| `--profil PLIK` | wybór profilu (domyślnie `profile/munich-continental.toml`) |
-| `--lista-profili` | pokazuje profile z katalogu `profile/` |
-| `--rozmiar 42` | inny rozmiar EU niż w profilu |
+| `--marka joma` | marka z katalogu (domyślnie `munich`) |
+| `--model top-flex` | model z katalogu (domyślnie `continental`); nazwa jak w `--lista-modeli` albo zwykła, np. `"top flex"` |
+| `--lista-modeli` | pokazuje marki, modele i rozmiary z katalogu |
+| `--profil PLIK` | własny plik profilu `.toml` zamiast modelu z katalogu |
+| `--rozmiar 42` | rozmiar EU (domyślnie 41); kilka po przecinku, np. `41,42`, szuka po kolei w każdym |
 | `--max-cena 300` | tylko oferty do 300 zł |
 | `--tylko-pewne` | tylko oferty z potwierdzoną dostępnością rozmiaru |
 | `--zrodla vinted,olx` | tylko wybrane źródła (`--lista-zrodel` pokazuje wszystkie) |
@@ -42,9 +54,27 @@ Przydatne opcje:
 | `--nie-otwieraj` | nie otwiera raportu HTML |
 | `-v` | więcej szczegółów w trakcie działania |
 
+## Katalog modeli
+
+Każda marka ma plik w `katalog/` (np. `katalog/joma.toml`), a `katalog/wspolne.toml` trzyma ustawienia wspólne dla wszystkich: listę rozmiarów, numery rozmiarów na Vinted, kategorie eBaya i sklepy, które szukają po frazie (Sportano, Revealsport, Gain Control).
+
+Profil wyszukiwania składa się z trzech poziomów, od ogólnego do szczegółowego: wspólne, marka, model. Zasady łączenia:
+
+* `wykluczenia`, `kody_wykluczone` i `nie_dotyczy` sumują się (np. Joma wyklucza turfy dla każdego modelu, a Top Flex dodatkowo Rebound)
+* sekcje takie jak `[vinted]` czy `[olx]` łączą się pole po polu
+* `[[sklep]]` sumują się, a sklep o tej samej nazwie na niższym poziomie zastępuje wyższy
+* pozostałe pola z niższego poziomu zastępują wyższe
+* `inne_modele_marki` program układa sam z pozostałych modeli marki i listy `inne_modele` z pliku marki
+
+Plik marki ma pola profilu (bez `model`) i listę modeli `[[model]]`. Każdy model ma `id` (używane w `--model` i w nazwie katalogu z danymi), `model` (słowa, które muszą być w tytule) i opcjonalnie `nazwa` oraz dowolne pola profilu. Sekcje modelu zapisuje się jako `[model.olx]`, `[[model.sklep]]` itd. Bez `frazy` program użyje „marka model” i „halowki marka model”.
+
+Nike, Adidas i Puma robią te same modele na różne nawierzchnie, dlatego ich pliki mają `oznaczenia_hali`: wzorce typu `\bic\b`, `\bin\b`, „halówki”, „futsal”. Oferta z nazwą modelu, ale bez takiego oznaczenia trafia do sprawdzenia zamiast na listę pewnych. Modele halowe z natury (Gato, Top Sala, Truco) mają `oznaczenia_hali = []`.
+
+Reguły dla modeli spoza Munich Continental i Joma Top Flex są na razie proste: nazwa, wykluczenia nawierzchni i lista innych modeli marki. Kody produktów warto dopisywać dopiero po sprawdzeniu ich na prawdziwych ofertach.
+
 ## Własny profil
 
-Najprościej skopiować `profile/joma-top-flex.toml` i zmienić wartości. Minimalny profil wystarczy do działania:
+Model spoza katalogu można opisać w osobnym pliku i uruchomić przez `--profil plik.toml`. Minimalny profil wystarczy do działania:
 
 ```toml
 marka = "Joma"
@@ -68,6 +98,7 @@ Wtedy program sam układa frazy wyszukiwania („joma top flex”), sam znajduje
 | `kody_wykluczone` | wzorce kodów innych wersji |
 | `inne_modele_marki` | nazwy innych modeli marki; ogłoszenie z taką nazwą jest odrzucane |
 | `nie_dotyczy` | słowa oznaczające zupełnie inne produkty (np. opony Continental) |
+| `oznaczenia_hali` | wzorce oznaczenia wersji halowej (np. `'\bic\b'`); bez nich oferta z nazwą modelu idzie do sprawdzenia |
 | `slowa_kategorii` | słowa typu „halówki”, „futsal”; ogłoszenie bez nazwy modelu trafia do sekcji „do sprawdzenia” tylko z takim słowem |
 | `[[wskazowki]]` | wskazówki z opisu ogłoszenia: `wzorzec`, opcjonalnie `oprocz`, `werdykt` (`odrzuc` albo `sprawdz`), `opis` |
 | `wskazowka_zdjec` | podpowiedź w raporcie, jak odróżnić model na zdjęciu |
@@ -88,7 +119,133 @@ Wzorce to wyrażenia regularne zapisane w apostrofach (`'...'`), sprawdzane na t
 
 **Jakość wyników zależy od profilu.** Dla Munich Continental profil zna kody produktu i odróżnia klasyka od V2. Dla nowego modelu warto dopisać wykluczenia podobnych wersji (dziecięcych, turfów, wersji „Pro” itp.), bo inaczej trafią na listę.
 
-Każdy profil ma osobną historię cen, odkryte sklepy i statystyki źródeł (`dane/profile/<profil>/`) oraz osobny raport (`wyniki/<profil>/`). Pamięć podręczna stron i limity zapytań są wspólne, więc dwa profile nie podwajają ruchu do tych samych stron.
+Każdy model ma osobną historię cen, odkryte sklepy i statystyki źródeł (`dane/profile/<marka>-<model>/`) oraz osobny raport dla każdego rozmiaru (`wyniki/<marka>-<model>/<rozmiar>/`). Pamięć podręczna stron i limity zapytań są wspólne, więc dwa profile nie podwajają ruchu do tych samych stron.
+
+## Interfejs w przeglądarce (Szatnia)
+
+Szatnia prowadzi przez cztery kroki: marka, model, rozmiar (można kilka) i filtry (cena z gotowymi progami, tylko potwierdzony rozmiar, świeże dane, wybór źródeł). Na dole cały czas widać podsumowanie i przycisk „Szukaj ofert” (skrót Ctrl ↵, na Macu ⌘ ↵). Wybór zostaje w przeglądarce po odświeżeniu strony.
+
+W trakcie szukania widać pasek postępu, stan każdego źródła i oferty, które spływają od razu, gdy źródło skończy. W scenie 3D każde źródło to świecąca kula na orbicie wokół buta: pulsuje, gdy trwa sprawdzanie, a potem zmienia kolor (zielony gotowe, żółty wstrzymane lub podejrzane, czerwony błąd). „Przerwij szukanie” (albo Esc) zatrzymuje wszystko w około sekundę, także w trakcie odstępów między zapytaniami. Wyniki ze źródeł, które zdążyły, zostają zapisane.
+
+Wyniki są w trzech grupach (potwierdzony rozmiar, rozmiar do sprawdzenia, model do sprawdzenia na zdjęciu), z zakładką dla każdego rozmiaru, filtrem źródła, sortowaniem i stronicowaniem po 12. Nad listą jest blok „Od ostatniego sprawdzenia” (nowe, tańsze, droższe, które zniknęły), a karty mają znaczki „nowa” i „taniej o X zł”. Przycisk „Ukryj” chowa ofertę od razu i zapisuje ją w `ukryte.txt`, a powiadomienie pozwala to cofnąć. Na końcu są linki do stron, które trzeba sprawdzić ręcznie.
+
+Własny model spoza katalogu dodasz przyciskiem „Dodaj własny model” w kroku „Model”. Podajesz markę (także nową), nazwę modelu i słowa do pominięcia, np. rebound albo jr, z gotowymi podpowiedziami. Model od razu trafia do katalogu i można go wyszukać. Własne modele są w `dane/wlasne_modele.json`, a usuwa się je w tym samym oknie, z potwierdzeniem.
+
+Wybór jest zapisany w adresie strony, np. `?marka=nike&model=tiempo&rozmiar=43,44`, więc link otwiera od razu ten model i rozmiary.
+
+**Najprościej (jeden serwer):** zbuduj interfejs raz, a potem uruchamiaj tylko serwer. Strona będzie pod `http://127.0.0.1:8765`.
+
+```bash
+cd interfejs
+```
+
+```bash
+npm install
+```
+
+```bash
+npm run build
+```
+
+```bash
+cd ..
+```
+
+```bash
+py serwer.py
+```
+
+**Przy pracy nad interfejsem** (podgląd zmian na żywo) wymagany jest Node.js 20 lub nowszy. Najpierw uruchom serwer API, a potem w drugim terminalu:
+
+```bash
+cd interfejs
+```
+
+```bash
+npm install
+```
+
+```bash
+npm run dev
+```
+
+Interfejs działa pod `http://127.0.0.1:5190` i przekazuje zapytania `/api` do serwera na porcie 8765. Testy end-to-end (komputer i telefon, same uruchamiają oba serwery, wyszukiwanie jest udawane, więc nie odpytują sklepów):
+
+```bash
+npm run test:e2e
+```
+
+Obok kroków stoi scena 3D (Three.js): stylizowany but zbudowany w kodzie, bez cudzych modeli i logo. Kolory zmieniają się pod wybraną markę, but podskakuje przy zmianie marki, a kamera przesuwa się z każdym krokiem. W kroku „Rozmiar” kamera patrzy z góry na miarkę 38–46, a nosek buta pokazuje największy zaznaczony rozmiar. Scena ładuje się osobno, już po wyświetleniu strony. Przy ustawieniu „ogranicz ruch” w systemie i w przeglądarkach bez WebGL zostaje płaski rysunek buta.
+
+### Prawdziwy model 3D buta
+
+Zamiast stylizowanego buta scena może pokazać prawdziwy model. Wystarczy plik `interfejs/public/modele/<marka>-<model>.glb`, np. `munich-continental.glb`. Te pliki są w `.gitignore`, bo powstają z prywatnych zdjęć. Serwer sam go wykryje, a scena wczyta go po wybraniu tego modelu. Program sam ustawia but: obraca go wzdłuż, skaluje do długości rozmiaru 42, stawia na podłodze i odwraca, jeśli pięta wypadła z przodu. Modele bez pliku i uszkodzone pliki dostają but stylizowany.
+
+Model powstaje z Twoich zdjęć (generator AI). Jak je zrobić:
+
+1. Jeden but, czysty, sznurówki zawiązane równo.
+2. Gładkie, kontrastowe tło (jasne dla ciemnego buta, ciemne dla jasnego), światło dzienne, bez lampy błyskowej i ostrych cieni.
+3. Cztery zdjęcia z wysokości buta, z tej samej odległości: bok zewnętrzny, bok wewnętrzny, przód (nosek) i tył (pięta).
+4. Cały but w kadrze, zajmuje ok. 70% zdjęcia, ostry, bez rąk i innych przedmiotów.
+5. Zdjęcia w pełnej rozdzielczości (JPG lub PNG) w katalogu `models/<marka>/<model>/`, np. `models/munich/continental/` albo `models/nike/tiempo/`. Katalogi dla wszystkich 36 modeli z katalogu już są. Cały `models/` jest w `.gitignore`.
+
+## Serwer API (dla interfejsu w przeglądarce)
+
+```bash
+py serwer.py
+```
+
+Serwer działa tylko lokalnie pod `http://127.0.0.1:8765`. Opis wszystkich adresów z możliwością wypróbowania jest pod `/api/dokumentacja`.
+
+| Metoda i adres | Działanie |
+|---|---|
+| `GET /api/zdrowie` | czy serwer działa i id trwającego wyszukiwania |
+| `GET /api/katalog` | rozmiary, marki i modele z katalogu |
+| `GET /api/katalog/{marka}/{model}/zrodla` | źródła dla modelu i to, czy są dostępne (np. eBay bez klucza nie jest) |
+| `GET /api/katalog/{marka}/{model}/wyniki/{rozmiar}` | ostatnie zapisane wyniki (`oferty.json`) |
+| `POST /api/wyszukiwania` | start wyszukiwania; odpowiada `202` z `id`, a `409`, gdy trwa inne |
+| `GET /api/wyszukiwania/{id}` | stan i gotowe wyniki dla każdego rozmiaru |
+| `GET /api/wyszukiwania/{id}/zdarzenia` | postęp na żywo (Server-Sent Events) |
+| `POST /api/wyszukiwania/{id}/przerwij` | przerywa wyszukiwanie; bieżący rozmiar kończy się wynikami częściowymi, kolejne są pomijane |
+| `POST /api/ukryte` | ukrywa ofertę, body `{"url": "..."}` |
+| `POST /api/ukryte/przywroc` | cofa ukrycie oferty, body `{"url": "..."}` |
+| `GET /api/wlasne` | lista własnych modeli |
+| `POST /api/wlasne` | dodaje własny model, body `{"marka", "model", "wykluczenia", "opis", "wymagaj_oznaczenia_hali"}` |
+| `DELETE /api/wlasne/{marka}/{model}` | usuwa własny model |
+
+Przykład startu wyszukiwania dwóch rozmiarów w dwóch źródłach:
+
+```bash
+curl -X POST http://127.0.0.1:8765/api/wyszukiwania -H "Content-Type: application/json" -d "{\"marka\": \"nike\", \"model\": \"tiempo\", \"rozmiary\": [\"42\", \"43\"], \"zrodla\": [\"vinted\", \"r-gol\"]}"
+```
+
+Pola: `marka`, `model`, `rozmiary` (38–46, do 9 naraz) oraz opcjonalnie `zrodla`, `max_cena`, `tylko_pewne`, `odswiez`, `reset_blokad`, `pokaz_ukryte`. Inne pola są odrzucane. Naraz trwa tylko jedno wyszukiwanie, bo wszystkie korzystają z tych samych limitów zapytań do stron.
+
+Zdarzenia w strumieniu mają kolejne `id`, więc po zerwaniu połączenia przeglądarka wznawia od miejsca przerwania (nagłówek `Last-Event-ID` albo `?od=`). Typy zdarzeń:
+
+| Typ | Kiedy | Najważniejsze dane |
+|---|---|---|
+| `wyszukiwanie_start` | na początku | `rozmiary` |
+| `start` | start rozmiaru | `rozmiar`, `zrodla`, `wstrzymane_hosty` |
+| `zrodlo_start` | źródło zaczyna | `zrodlo` |
+| `log` | komunikat źródła | `zrodlo`, `tekst` |
+| `zrodlo_koniec` | źródło skończyło | `status`, `ofert`, `odczytano`, `oferty` (już z ceną w zł) |
+| `koniec` | rozmiar gotowy | `wyniki` w formacie `oferty.json` |
+| `blad` | wyszukiwanie przerwane błędem | `komunikat` |
+| `przerywanie` | po prośbie o przerwanie | brak |
+| `wyszukiwanie_koniec` | zawsze na końcu | `stan` (`gotowe`, `przerwane` albo `blad`) |
+
+Serwer przyjmuje tylko adresy `localhost` i `127.0.0.1` (ochrona przed DNS rebinding), odrzuca żądania wysłane z obcych stron (nagłówek `Origin`) i dodaje nagłówki bezpieczeństwa, w tym Content-Security-Policy. Jeśli istnieje `interfejs/dist`, serwer podaje też stronę, a nieznane adresy dostają własną stronę 404.
+
+Strona ma politykę prywatności i regulamin (`interfejs/polityka-prywatnosci.html`, `interfejs/regulamin.html`), favicon, obraz Open Graph 1200x630 (`interfejs/public/og.png`), `robots.txt` i `sitemap.xml`. Pola `[[...]]` (dane administratora, domena) trzeba uzupełnić przed udostępnieniem strony innym osobom.
+
+## Testy
+
+Sprawdzają, że każdy model z katalogu składa się w poprawny profil w każdym rozmiarze, że reguły rozpoznają typowe tytuły ofert, oraz całe API ze strumieniem zdarzeń na udawanym silniku (bez łączenia z internetem):
+
+```bash
+py -m unittest discover -s testy -t .
+```
 
 ## Źródła
 

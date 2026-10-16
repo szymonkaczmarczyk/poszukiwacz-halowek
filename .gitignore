@@ -88,3 +88,6 @@ playwright/.cache/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+models/
+interfejs/public/modele/*.glb

@@ -8,8 +8,12 @@ PROFIL_PRZEGLADARKI = DANE / "profil_przegladarki"
 PLIK_STANU = DANE / "stan_hostow.json"
 PLIK_ENV = KATALOG / ".env"
 PLIK_UKRYTYCH = KATALOG / "ukryte.txt"
-KATALOG_PROFILI = KATALOG / "profile"
-DOMYSLNY_PROFIL = KATALOG_PROFILI / "munich-continental.toml"
+PLIK_WLASNYCH = DANE / "wlasne_modele.json"
+KATALOG_MODELI = KATALOG / "katalog"
+PLIK_WSPOLNY = KATALOG_MODELI / "wspolne.toml"
+DOMYSLNY_MODEL = ("munich", "continental")
+KATALOG_MODELI_3D = KATALOG / "interfejs" / "public" / "modele"
+KATALOG_INTERFEJSU = KATALOG / "interfejs" / "dist"
 STARE_PLIKI_DANYCH = ("historia.json", "historia_41.json", "zdrowie_zrodel.json", "odkryte.json")
 
 WYSYLKA_SZACUNKOWA = {

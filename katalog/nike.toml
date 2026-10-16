@@ -1,0 +1,46 @@
+marka = "Nike"
+opis_wykluczen = "tylko wersje halowe (IC), bez korków i turfów"
+wykluczenia = ['\bfg\b', '\bag\b', '\bsg\b', '\bmg\b', '\btf\b', 'turf']
+inne_modele = ["premier"]
+oznaczenia_hali = ['\bic\b', 'indoor', 'halow', 'na hal', 'futsal', 'sala\b', 'hallen', 'zaal', 'salle']
+
+[[model]]
+id = "tiempo"
+model = "Tiempo"
+nazwa = "Nike Tiempo IC"
+frazy = ["nike tiempo ic", "halowki nike tiempo"]
+
+[[model]]
+id = "phantom"
+model = "Phantom"
+nazwa = "Nike Phantom IC"
+frazy = ["nike phantom ic", "halowki nike phantom"]
+
+[[model]]
+id = "mercurial-vapor"
+model = "Vapor"
+nazwa = "Nike Mercurial Vapor IC"
+frazy = ["nike mercurial vapor ic", "halowki nike mercurial vapor"]
+
+[[model]]
+id = "mercurial-superfly"
+model = "Superfly"
+nazwa = "Nike Mercurial Superfly IC"
+frazy = ["nike mercurial superfly ic", "halowki nike mercurial superfly"]
+
+[[model]]
+id = "lunar-gato"
+model = "Lunar Gato"
+nazwa = "Nike Lunar Gato II"
+oznaczenia_hali = []
+
+[[model]]
+id = "streetgato"
+model = "Streetgato"
+oznaczenia_hali = []
+frazy = ["nike streetgato", "halowki nike streetgato"]
+
+[[model]]
+id = "react-gato"
+model = "React Gato"
+oznaczenia_hali = []

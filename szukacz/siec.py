@@ -30,6 +30,10 @@ class ZrodloNiedostepne(Exception):
     pass
 
 
+class Przerwano(Exception):
+    pass
+
+
 @dataclass
 class Odpowiedz:
     status: int
@@ -104,8 +108,9 @@ class Cache:
 
 
 class Ogranicznik:
-    def __init__(self, plik):
+    def __init__(self, plik, przerwanie=None):
         self.plik = plik
+        self.przerwanie = przerwanie or threading.Event()
         self._blokada = threading.RLock()
         self._kolejki = defaultdict(threading.Lock)
         self.licznik = Counter()
@@ -150,7 +155,13 @@ class Ogranicznik:
             self.stan["blokady"] = {}
             self._zapisz()
 
+    def czekaj(self, sekundy):
+        if self.przerwanie.wait(max(0.0, sekundy)):
+            raise Przerwano("wyszukiwanie przerwane")
+
     def sprawdz(self, h):
+        if self.przerwanie.is_set():
+            raise Przerwano("wyszukiwanie przerwane")
         wpis = self.blokada(h)
         if wpis:
             do = time.strftime("%d.%m %H:%M", time.localtime(wpis["do"]))
@@ -172,7 +183,7 @@ class Ogranicznik:
                 ostatnie = self.stan["ostatnie"].get(h, 0)
             czekaj = ostatnie + lim["odstep"] + random.uniform(0, lim["losowo"]) - time.time()
             if czekaj > 0:
-                time.sleep(czekaj)
+                self.czekaj(czekaj)
             self.licznik[h] += 1
             try:
                 yield
@@ -229,7 +240,7 @@ class KlientHttp:
             if r is None:
                 if proba >= 3:
                     raise ZrodloNiedostepne(f"{h}: błąd sieci ({blad.__class__.__name__})")
-                time.sleep(10 * proba)
+                self.ogranicznik.czekaj(10 * proba)
                 continue
             odp = Odpowiedz(r.status_code, r.text, r.url)
             if r.status_code in (429, 503) and not wyglada_na_blokade(200, odp.tekst):
@@ -238,7 +249,7 @@ class KlientHttp:
                     raise ZrodloNiedostepne(f"{h}: HTTP {r.status_code}, host wstrzymany na 2 h")
                 przerwa = min(_retry_after(r) or 40 * proba, 180)
                 self.log(h, f"HTTP {r.status_code}, odczekuję {przerwa:.0f} s")
-                time.sleep(przerwa)
+                self.ogranicznik.czekaj(przerwa)
                 continue
             if wyglada_na_blokade(r.status_code, odp.tekst, r.headers.get("Content-Type", "")):
                 self.ogranicznik.zablokuj(h, U.BLOKADA_GODZIN, f"ochrona antybotowa, HTTP {r.status_code}")
@@ -246,7 +257,7 @@ class KlientHttp:
                     f"{h}: wykryto ochronę antybotową, host wstrzymany na {U.BLOKADA_GODZIN} h"
                 )
             if r.status_code >= 500 and proba < 2:
-                time.sleep(20)
+                self.ogranicznik.czekaj(20)
                 continue
             if uzyj_cache and r.status_code == 200:
                 self.cache.zapisz(pelny, odp)

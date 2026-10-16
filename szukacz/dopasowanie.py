@@ -55,6 +55,8 @@ def model_profilu(tekst):
     if _pasuje(p.kody_modelu, n):
         return "model", "kod produktu modelu"
     if _zawiera_slowa(n, _slowa(p.model)):
+        if p.oznaczenia_hali and not _pasuje(p.oznaczenia_hali, n):
+            return "?", "brak oznaczenia wersji halowej"
         return "model", "nazwa modelu"
     for nazwa in p.inne_modele_marki:
         if normalizuj(nazwa) in n + " ":

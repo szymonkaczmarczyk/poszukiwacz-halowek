@@ -1,0 +1,54 @@
+marka = "Joma"
+opis_wykluczen = "bez turfów i wersji dziecięcych"
+wykluczenia = ['\bjr\b', 'junior', 'turf', '\btf\b', 'orlik', 'sztuczn', '\d{4}\s?tf\b']
+inne_modele = ["liga", "regate", "aguila", "tactico"]
+
+[[model]]
+id = "top-flex"
+model = "Top Flex"
+opis_wykluczen = "bez Rebound i Jr"
+frazy = ["joma top flex", "halowki joma top flex"]
+wykluczenia = ['rebound']
+kody_modelu = ['\btop[sw]\d{4}(?:in)?\b']
+kody_wykluczone = ['\btor[sw]\d{4}', '\btpj[sw]\d{4}', '\btop[sw]\d{4}tf\b']
+wskazowka_zdjec = "Top Flex: skórzana cholewka i napis TOP FLEX z boku; Rebound ma grubszą podeszwę z napisem REBOUND"
+
+[[model]]
+id = "top-flex-rebound"
+model = "Top Flex Rebound"
+opis_wykluczen = "bez zwykłego Top Flex i Jr"
+kody_modelu = ['\btor[sw]\d{4}(?:in)?\b']
+kody_wykluczone = ['\btop[sw]\d{4}', '\btpj[sw]\d{4}']
+wskazowka_zdjec = "Rebound ma grubszą podeszwę z napisem REBOUND; zwykły Top Flex ma płaską podeszwę"
+
+[[model]]
+id = "mundial"
+model = "Mundial"
+
+[[model]]
+id = "dribling"
+model = "Dribling"
+
+[[model]]
+id = "invicto"
+model = "Invicto"
+
+[[model]]
+id = "liga-5"
+model = "Liga 5"
+
+[[model]]
+id = "fs-reactive"
+model = "FS Reactive"
+
+[[model]]
+id = "regate-rebound"
+model = "Regate Rebound"
+
+[[model]]
+id = "maxima"
+model = "Maxima"
+
+[[model]]
+id = "cancha"
+model = "Cancha"

@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 
 from .przegladarka import Przegladarka
-from .siec import ZrodloNiedostepne
+from .siec import Przerwano, ZrodloNiedostepne
 
 
 @dataclass
@@ -28,7 +28,7 @@ class WynikZrodla:
 
 
 class Kontekst:
-    def __init__(self, profil, http, ogranicznik, cache, rozmiar, widoczna_przegladarka=False, gadatliwy=False):
+    def __init__(self, profil, http, ogranicznik, cache, rozmiar, widoczna_przegladarka=False, gadatliwy=False, sluchacz=None):
         self.profil = profil
         self.http = http
         self.ogranicznik = ogranicznik
@@ -37,13 +37,20 @@ class Kontekst:
         self.widoczna_przegladarka = widoczna_przegladarka
         self.gadatliwy = gadatliwy
         self.odkrywaj = False
+        self.sluchacz = sluchacz
         self._druk = threading.Lock()
         self._watek = threading.local()
 
+    def zdarzenie(self, typ, dane):
+        with self._druk:
+            if self.sluchacz:
+                self.sluchacz(typ, dane)
+            elif typ == "log":
+                print(f"  [{dane['zrodlo']}] {dane['tekst']}", flush=True)
+
     def log(self, zrodlo, tekst, zawsze=True):
         if zawsze or self.gadatliwy:
-            with self._druk:
-                print(f"  [{zrodlo}] {tekst}", flush=True)
+            self.zdarzenie("log", {"zrodlo": zrodlo, "tekst": tekst})
 
     def zlicz(self, liczba):
         wynik = getattr(self._watek, "wynik", None)
@@ -56,11 +63,15 @@ class Kontekst:
 
 def _wykonaj(zadanie, kontekst):
     wynik = WynikZrodla(zadanie.nazwa)
+    kontekst.zdarzenie("zrodlo_start", {"zrodlo": zadanie.nazwa})
     kontekst._watek.wynik = wynik
     start = time.time()
     przed = sum(kontekst.ogranicznik.licznik[h] for h in zadanie.hosty)
     try:
         zadanie.funkcja(kontekst, wynik.oferty)
+    except Przerwano:
+        wynik.status = "przerwane"
+        wynik.komunikat = "przerwane na prośbę"
     except ZrodloNiedostepne as e:
         wynik.status = "wstrzymane"
         wynik.komunikat = str(e)
@@ -90,4 +101,5 @@ def uruchom(zadania, kontekst):
             wynik = p.result()
             wynik.min_surowych = kontekst.profil.min_odczytow(przyszle[p].nazwa)
             wyniki.append(wynik)
+            kontekst.zdarzenie("zrodlo_koniec", {"wynik": wynik})
     return wyniki

@@ -1,0 +1,32 @@
+marka = "Adidas"
+opis_wykluczen = "tylko wersje halowe (IN), bez korków i turfów"
+wykluczenia = ['\bfg\b', '\bag\b', '\bsg\b', '\bmg\b', '\btf\b', 'turf']
+oznaczenia_hali = ['\bin\b', '\bic\b', 'indoor', 'halow', 'na hal', 'futsal', 'sala\b', 'hallen', 'zaal', 'salle']
+
+[[model]]
+id = "top-sala"
+model = "Top Sala"
+oznaczenia_hali = []
+
+[[model]]
+id = "super-sala"
+model = "Super Sala"
+oznaczenia_hali = []
+
+[[model]]
+id = "predator"
+model = "Predator"
+nazwa = "Adidas Predator IN"
+frazy = ["adidas predator in", "halowki adidas predator"]
+
+[[model]]
+id = "copa"
+model = "Copa"
+nazwa = "Adidas Copa IN"
+frazy = ["adidas copa in", "halowki adidas copa"]
+
+[[model]]
+id = "f50"
+model = "F50"
+nazwa = "Adidas F50 IN"
+frazy = ["adidas f50 in", "halowki adidas f50"]

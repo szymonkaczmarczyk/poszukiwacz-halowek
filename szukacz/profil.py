@@ -14,7 +14,7 @@ class BladProfilu(Exception):
     pass
 
 
-def _slug(tekst):
+def slug(tekst):
     tekst = unicodedata.normalize("NFKD", tekst).encode("ascii", "ignore").decode()
     return re.sub(r"[^a-z0-9]+", "-", tekst.lower()).strip("-") or "profil"
 
@@ -49,10 +49,12 @@ class Profil:
     sklepy: list = field(default_factory=list)
     reczne: list = field(default_factory=list)
     minimalne_odczyty: dict = field(default_factory=dict)
+    oznaczenia_hali: list = field(default_factory=list)
+    identyfikator: str = ""
 
     @property
     def slug(self):
-        return _slug(self.plik.stem)
+        return slug(self.identyfikator or self.plik.stem)
 
     @property
     def fraza(self):
@@ -62,9 +64,8 @@ class Profil:
     def katalog_danych(self):
         return U.DANE / "profile" / self.slug
 
-    @property
-    def katalog_wynikow(self):
-        return U.WYNIKI / self.slug
+    def katalog_wynikow(self, rozmiar=None):
+        return U.WYNIKI / self.slug / str(rozmiar or self.rozmiar)
 
     def podstaw(self, szablon, rozmiar=None):
         rozmiar = rozmiar or self.rozmiar
@@ -93,6 +94,11 @@ def wczytaj(plik):
         raise BladProfilu(f"nie mogę otworzyć profilu {plik}: {e}") from e
     except tomllib.TOMLDecodeError as e:
         raise BladProfilu(f"błąd składni w profilu {plik.name}: {e}") from e
+    return z_danych(dane, plik)
+
+
+def z_danych(dane, plik):
+    dane = dict(dane)
     brakujace = [k for k in ("marka", "model") if not dane.get(k)]
     if brakujace:
         raise BladProfilu(f"w profilu {plik.name} brakuje pól: {', '.join(brakujace)}")
@@ -106,7 +112,7 @@ def wczytaj(plik):
     nieznane = sorted(set(dane) - znane)
     if nieznane:
         raise BladProfilu(f"nieznane pola w profilu {plik.name}: {', '.join(nieznane)}")
-    for klucz in ("wykluczenia", "kody_modelu", "kody_wykluczone", "nie_dotyczy", "slowa_kategorii"):
+    for klucz in ("wykluczenia", "kody_modelu", "kody_wykluczone", "nie_dotyczy", "slowa_kategorii", "oznaczenia_hali"):
         for wzorzec in dane.get(klucz, []):
             try:
                 re.compile(wzorzec)
@@ -122,5 +128,6 @@ def ustaw(profil):
 
 def aktywny():
     if _aktywny is None:
-        ustaw(wczytaj(U.DOMYSLNY_PROFIL))
+        from . import katalog
+        ustaw(katalog.profil(*U.DOMYSLNY_MODEL))
     return _aktywny

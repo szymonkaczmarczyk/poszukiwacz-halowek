@@ -1,6 +1,6 @@
 import threading
 
-from .siec import ZrodloNiedostepne
+from .siec import Przerwano, ZrodloNiedostepne
 
 ZAPASOWE = {"EUR": 4.25, "GBP": 4.90, "USD": 3.70, "CZK": 0.17, "HUF": 0.0105, "RON": 0.85, "SEK": 0.38, "DKK": 0.57}
 
@@ -25,7 +25,7 @@ class Kursy:
                     godziny_cache=12,
                 )
                 kurs = float(odp.json()["rates"][0]["mid"]) if odp.status == 200 else None
-            except (ZrodloNiedostepne, ValueError, KeyError, IndexError):
+            except (ZrodloNiedostepne, Przerwano, ValueError, KeyError, IndexError):
                 kurs = None
             if kurs is None:
                 kurs = ZAPASOWE.get(waluta, 1.0)

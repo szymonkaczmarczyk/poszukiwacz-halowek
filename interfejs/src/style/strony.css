@@ -1,0 +1,153 @@
+.strona {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+.strona main {
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: calc(var(--wysokosc-naglowka) + var(--odstep-8)) var(--odstep-4) var(--odstep-9);
+}
+
+.strona .naglowek__wroc {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--odstep-2);
+  min-height: var(--cel-dotyku);
+  color: var(--kolor-tekst-drugi);
+  text-decoration: none;
+  font-size: var(--rozmiar-maly);
+}
+
+.strona .naglowek__wroc:hover {
+  color: var(--kolor-tekst);
+}
+
+.tekst-prawny {
+  display: flex;
+  flex-direction: column;
+  gap: var(--odstep-4);
+}
+
+.tekst-prawny h1 {
+  font-size: var(--rozmiar-h2);
+  max-width: none;
+}
+
+.tekst-prawny h2 {
+  margin-top: var(--odstep-5);
+  font-size: var(--rozmiar-h4);
+  letter-spacing: -0.03em;
+}
+
+.tekst-prawny p,
+.tekst-prawny li {
+  color: var(--kolor-tekst-drugi);
+}
+
+.tekst-prawny ul,
+.tekst-prawny ol {
+  margin: 0;
+  padding-left: var(--odstep-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--odstep-2);
+  max-width: var(--szerokosc-tekstu);
+}
+
+.tekst-prawny a {
+  color: var(--kolor-akcent-mocny);
+}
+
+.uzupelnij {
+  padding: 0 var(--odstep-1);
+  border-radius: var(--promien-maly);
+  background: var(--kolor-ostrzezenie-tlo);
+  color: var(--kolor-ostrzezenie);
+  font-weight: 600;
+}
+
+.blad-404 {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--odstep-5);
+}
+
+.blad-404__liczba {
+  font-size: clamp(120px, 28vw, 240px);
+  font-weight: 750;
+  letter-spacing: -0.08em;
+  line-height: 0.9;
+  color: var(--kolor-akcent);
+}
+
+.blad-404 h1 {
+  font-size: var(--rozmiar-h2);
+  max-width: 18ch;
+}
+
+.blad-404__akcje {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--odstep-3);
+}
+
+.stopka {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--odstep-3) var(--odstep-5);
+  padding: var(--odstep-6) var(--odstep-4) calc(var(--wysokosc-paska) + var(--odstep-7));
+  border-top: 1px solid var(--kolor-linia);
+  color: var(--kolor-tekst-trzeci);
+  font-size: var(--rozmiar-maly);
+}
+
+.strona .stopka {
+  padding-bottom: var(--odstep-6);
+}
+
+.stopka nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--odstep-2) var(--odstep-5);
+}
+
+.stopka a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--cel-dotyku);
+  color: var(--kolor-tekst-drugi);
+  text-decoration: none;
+}
+
+.stopka a:hover {
+  color: var(--kolor-tekst);
+  text-decoration: underline;
+}
+
+@media (min-width: 768px) {
+  .stopka {
+    padding-inline: var(--odstep-7);
+  }
+}
+
+@media (min-width: 1024px) {
+  .strona-glowna .stopka {
+    width: calc(100% - var(--szerokosc-sceny));
+    padding-left: var(--odstep-9);
+  }
+}
+
+@media (min-width: 1280px) {
+  .strona-glowna .stopka {
+    padding-left: 160px;
+  }
+}
