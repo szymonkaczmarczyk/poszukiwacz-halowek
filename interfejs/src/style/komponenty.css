@@ -178,8 +178,9 @@
 
 .wybor__znak {
   position: absolute;
-  top: var(--odstep-3);
-  right: var(--odstep-3);
+  top: 50%;
+  right: var(--odstep-4);
+  margin-top: -12px;
   display: grid;
   place-items: center;
   width: 24px;
@@ -208,7 +209,7 @@
   flex-direction: column;
   gap: var(--odstep-1);
   min-width: 0;
-  padding-right: var(--odstep-5);
+  padding-right: var(--odstep-7);
 }
 
 .wybor__meta {
@@ -248,7 +249,7 @@
 }
 
 .lista-modeli .wybor {
-  align-items: flex-start;
+  align-items: center;
 }
 
 .wybor__nazwa {

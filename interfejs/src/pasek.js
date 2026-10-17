@@ -1,7 +1,12 @@
+import { gsap } from "gsap";
+import { Flip } from "gsap/Flip";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { el, wyczysc, zl } from "./dom.js";
 import { ikona } from "./ikony.js";
 import { pobierz, subskrybuj } from "./stan.js";
-import { przewin, sledzHero, sprezyna } from "./ruch.js";
+import { ograniczonyRuch, przewin, sledzHero, sprezyna } from "./ruch.js";
+
+gsap.registerPlugin(Flip, ScrollTrigger);
 
 const MAC = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
 
@@ -14,8 +19,33 @@ export function brakujace(stan) {
   return braki;
 }
 
-export function pasek({ element, wybor, brak, przycisk, skrot }, katalog, naStart) {
+export function pasek({ element, wybor, brak, przycisk, skrot, kotwica }, katalog, naStart) {
   let trwa = false;
+  let zadokowany = false;
+  let naHero = true;
+  const domPoczatkowy = element.parentNode;
+  const nastepnyPoczatkowy = element.nextSibling;
+
+  function dopasujKotwice() {
+    kotwica.style.minHeight = `${element.offsetHeight}px`;
+  }
+
+  function dokuj(tak) {
+    if (zadokowany === tak) return;
+    zadokowany = tak;
+    const stan = Flip.getState(element);
+    element.classList.add("pasek--przenoszony");
+    if (tak) kotwica.append(element);
+    else domPoczatkowy.insertBefore(element, nastepnyPoczatkowy);
+    element.classList.toggle("pasek--zadokowany", tak);
+    element.classList.toggle("pasek--widoczny", tak || !naHero);
+    const koniec = () => element.classList.remove("pasek--przenoszony");
+    if (ograniczonyRuch()) {
+      koniec();
+      return;
+    }
+    Flip.from(stan, { duration: 0.6, ease: "power3.inOut", onComplete: koniec, onInterrupt: koniec });
+  }
   skrot.textContent = MAC ? "⌘\u00a0↵" : "Ctrl\u00a0↵";
 
   function opis(stan) {
@@ -61,7 +91,20 @@ export function pasek({ element, wybor, brak, przycisk, skrot }, katalog, naStar
       uruchom();
     }
   });
-  sledzHero((naHero) => element.classList.toggle("pasek--widoczny", !naHero));
+  sledzHero((wHero) => {
+    naHero = wHero;
+    if (!zadokowany) element.classList.toggle("pasek--widoczny", !wHero);
+  });
+  dopasujKotwice();
+  new ResizeObserver(() => {
+    if (!zadokowany) dopasujKotwice();
+  }).observe(element);
+  ScrollTrigger.create({
+    trigger: kotwica,
+    start: "bottom bottom-=12",
+    onEnter: () => dokuj(true),
+    onLeaveBack: () => dokuj(false),
+  });
   subskrybuj(odswiez);
   odswiez();
 

@@ -30,7 +30,7 @@ class KatalogTest(unittest.TestCase):
 
     def test_wyszukiwanie_po_nazwie_i_identyfikatorze(self):
         self.assertEqual(katalog.profil("Joma", "Top Flex").slug, "joma-top-flex")
-        self.assertEqual(katalog.profil(None, "mercurial-vapor").nazwa, "Nike Mercurial Vapor IC")
+        self.assertEqual(katalog.profil(None, "lunar-gato").nazwa, "Nike Lunargato II")
         with self.assertRaises(katalog.BladKatalogu):
             katalog.profil("nike", "gresca")
 
@@ -50,30 +50,53 @@ class KatalogTest(unittest.TestCase):
         self.assertEqual(ocena("munich", "continental-v2", "Munich Continental 944"), "inny")
         self.assertEqual(ocena("munich", "continental-v2", "Munich 4100944"), "wykluczony")
 
+    def test_munich_one_rondo_debut(self):
+        modele = [m.id for m in katalog.znajdz("munich", "continental")[0].modele]
+        self.assertEqual(modele, ["continental", "continental-v2", "gresca", "g-3", "arenga", "one", "debut", "rondo"])
+        self.assertEqual(ocena("munich", "one", "Munich One 42 halówki"), "model")
+        self.assertEqual(ocena("munich", "one", "Munich Gresca czerwone"), "inny")
+        self.assertEqual(ocena("munich", "rondo", "Munich Rondito 33"), "inny")
+        self.assertEqual(ocena("munich", "rondo", "Munich Rondo 42"), "model")
+        self.assertEqual(ocena("munich", "debut", "Munich Debut 42"), "model")
+        self.assertEqual(ocena("munich", "continental", "Munich Tiga indoor"), "inny")
+
+    def test_inne_modele_tylko_calymi_slowami(self):
+        self.assertEqual(ocena("munich", "continental", "Halówki Munich czerwone, noszone, zielone"), "?")
+        self.assertEqual(ocena("munich", "continental", "Munich One"), "inny")
+        self.assertEqual(ocena("munich", "continental-v2", "Munich Continental V 2"), "model")
+        self.assertEqual(ocena("nike", "streetgato", "Nike Street Gato IC"), "model")
+        self.assertEqual(ocena("joma", "top-flex", "Joma TopFlex 2402"), "model")
+
     def test_joma(self):
         self.assertEqual(ocena("joma", "top-flex", "Joma Top Flex TOPS2402IN"), "model")
         self.assertEqual(ocena("joma", "top-flex", "Joma Top Flex Rebound 2401"), "wykluczony")
         self.assertEqual(ocena("joma", "top-flex", "Joma Top Flex Turf"), "wykluczony")
         self.assertEqual(ocena("joma", "top-flex", "Joma Liga 5 IN"), "inny")
-        self.assertEqual(ocena("joma", "top-flex-rebound", "Joma Top Flex Rebound 2401 IN"), "model")
+        self.assertEqual(ocena("joma", "gambeta", "Joma Gambeta 2401 IN"), "model")
+        self.assertEqual(ocena("joma", "mundial", "Joma Invicto IN"), "inny")
 
     def test_nike_wymaga_wersji_halowej(self):
-        self.assertEqual(ocena("nike", "tiempo", "Nike Tiempo Legend 10 Academy IC"), "model")
-        self.assertEqual(ocena("nike", "tiempo", "Nike Tiempo Legend 10 Academy FG"), "wykluczony")
-        self.assertEqual(ocena("nike", "tiempo", "Nike Tiempo Legend 10 Academy"), "?")
-        self.assertEqual(ocena("nike", "tiempo", "Nike Phantom GX Academy IC"), "inny")
-        self.assertEqual(ocena("nike", "mercurial-vapor", "Nike Mercurial Superfly 9 Club IC"), "inny")
+        self.assertEqual(ocena("nike", "phantom", "Nike Phantom GX Academy IC"), "model")
+        self.assertEqual(ocena("nike", "phantom", "Nike Phantom GX Academy FG"), "wykluczony")
+        self.assertEqual(ocena("nike", "phantom", "Nike Phantom GX Academy"), "?")
+        self.assertEqual(ocena("nike", "phantom", "Nike Tiempo Legend 10 IC"), "inny")
+        self.assertEqual(ocena("nike", "phantom", "Nike Mercurial Superfly 9 Club IC"), "inny")
+        self.assertEqual(ocena("nike", "gato", "Nike Gato II"), "model")
+        self.assertEqual(ocena("nike", "gato", "Nike Lunargato II"), "wykluczony")
+        self.assertEqual(ocena("nike", "gato", "Nike Tiempo Streetgato"), "wykluczony")
+        self.assertEqual(ocena("nike", "react-gato", "Nike Tiempo Reactgato"), "model")
         self.assertEqual(ocena("nike", "lunar-gato", "Nike Lunar Gato II"), "model")
-        P.ustaw(katalog.profil("nike", "mercurial-vapor", "42"))
-        self.assertTrue(to_szukany_model("Nike Mercurial Vapor 15 Academy IC"))
-        self.assertFalse(to_szukany_model("Nike Mercurial Vapor 15 Academy IC Jr"))
+        P.ustaw(katalog.profil("nike", "phantom", "42"))
+        self.assertTrue(to_szukany_model("Nike Phantom GX 2 Academy IC"))
+        self.assertFalse(to_szukany_model("Nike Phantom GX 2 Academy IC Jr"))
 
-    def test_adidas_puma_mizuno(self):
+    def test_adidas_mizuno(self):
         self.assertEqual(ocena("adidas", "predator", "adidas Predator League IN"), "model")
         self.assertEqual(ocena("adidas", "predator", "adidas Predator League TF"), "wykluczony")
-        self.assertEqual(ocena("adidas", "top-sala", "adidas Top Sala Competition"), "model")
-        self.assertEqual(ocena("puma", "future", "Puma Future 7 Play IT"), "model")
-        self.assertEqual(ocena("puma", "truco", "Puma Truco III"), "model")
+        self.assertEqual(ocena("adidas", "top-sala", "adidas Top Sala II"), "model")
+        self.assertEqual(ocena("adidas", "super-sala", "adidas Super Sala III"), "model")
+        self.assertEqual(ocena("adidas", "predator", "adidas Copa Pure IN"), "inny")
+        self.assertEqual(ocena("mizuno", "morelia-sala", "Mizuno Monarcida Neo Sala"), "inny")
         self.assertEqual(ocena("mizuno", "morelia-sala", "Mizuno Morelia Sala Elite IN"), "model")
         self.assertEqual(ocena("mizuno", "morelia-sala", "Mizuno Morelia Sala Classic TF"), "wykluczony")
 

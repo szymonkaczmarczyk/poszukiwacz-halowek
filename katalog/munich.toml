@@ -1,8 +1,8 @@
 marka = "Munich"
 aliasy_marki = ["munchen"]
 inne_modele = [
-    "rondo", "rondito", "g3 ", "profit", "hooper", "mundial", "barru", "doro", "massana", "dash",
-    "estadio", "debut", "olympix", "x-ice", "osaka", "indra", "nebula", "clip ",
+    "rondito", "g3", "profit", "hooper", "mundial", "barru", "doro", "massana", "dash",
+    "estadio", "olympix", "x-ice", "osaka", "indra", "nebula", "clip", "tiga", "prisma", "oxygen",
 ]
 
 [vinted]
@@ -159,13 +159,15 @@ id = "arenga"
 model = "Arenga"
 
 [[model]]
-id = "tiga"
-model = "Tiga"
+id = "one"
+model = "One"
+nazwa = "Munich One"
+frazy = ["munich one", "halowki munich one"]
 
 [[model]]
-id = "prisma"
-model = "Prisma"
+id = "debut"
+model = "Debut"
 
 [[model]]
-id = "oxygen"
-model = "Oxygen"
+id = "rondo"
+model = "Rondo"

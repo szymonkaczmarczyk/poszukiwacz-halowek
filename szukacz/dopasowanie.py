@@ -37,11 +37,23 @@ def _slowa(tekst):
     return [s for s in re.split(r"[^a-z0-9]+", normalizuj(tekst)) if s]
 
 
+def _sklejone_slowa(n, cel):
+    slowa = _slowa(n)
+    for poczatek in range(len(slowa)):
+        sklejone = ""
+        for slowo in slowa[poczatek:]:
+            sklejone += slowo
+            if sklejone == cel:
+                return True
+            if len(sklejone) >= len(cel):
+                break
+    return False
+
+
 def _zawiera_slowa(n, slowa):
     if not slowa:
         return False
-    zwarte = re.sub(r"[^a-z0-9]+", "", n)
-    return all(re.search(rf"(?<![a-z0-9]){re.escape(s)}(?![a-z0-9])", n) for s in slowa) or "".join(slowa) in zwarte
+    return all(re.search(rf"(?<![a-z0-9]){re.escape(s)}(?![a-z0-9])", n) for s in slowa) or _sklejone_slowa(n, "".join(slowa))
 
 
 def model_profilu(tekst):
@@ -59,7 +71,7 @@ def model_profilu(tekst):
             return "?", "brak oznaczenia wersji halowej"
         return "model", "nazwa modelu"
     for nazwa in p.inne_modele_marki:
-        if normalizuj(nazwa) in n + " ":
+        if _zawiera_slowa(n, _slowa(nazwa)):
             return "inny", f"inny model ({nazwa.strip()})"
     return "?", ""
 

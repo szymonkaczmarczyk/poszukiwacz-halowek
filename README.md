@@ -4,12 +4,11 @@ Szuka wybranego modelu butów w podanym rozmiarze w sklepach i na marketplace'ac
 
 Co szukać, wybierasz z **katalogu modeli** (`katalog/`): marka, model i rozmiar od 38 do 46. W katalogu są halówki sześciu marek:
 
-* Munich: Continental, Continental V2, Gresca, G-3, Arenga, Tiga, Prisma, Oxygen
-* Joma: Top Flex, Top Flex Rebound, Mundial, Dribling, Invicto, Liga 5, FS Reactive, Regate Rebound, Maxima, Cancha
-* Nike: Tiempo, Phantom, Mercurial Vapor, Mercurial Superfly (wersje IC), Lunar Gato II, Streetgato, React Gato
-* Adidas: Top Sala, Super Sala, Predator, Copa, F50 (wersje IN)
-* Puma: Truco, Future, Ultra, King (wersje IT)
-* Mizuno: Morelia Sala, Monarcida Sala
+* Munich: Continental, Continental V2, Gresca, G-3, Arenga, One, Debut, Rondo
+* Joma: Top Flex, Mundial, Gambeta, Dribling, Maxima
+* Nike: Tiempo Streetgato, Tiempo Reactgato, Phantom (wersje IC), Gato, Lunargato II
+* Adidas: Super Sala III, Top Sala II, F50 i Predator (wersje IN)
+* Mizuno: Morelia Sala
 
 Domyślnie program szuka Munich Continental w rozmiarze 41.
 
@@ -68,7 +67,7 @@ Profil wyszukiwania składa się z trzech poziomów, od ogólnego do szczegóło
 
 Plik marki ma pola profilu (bez `model`) i listę modeli `[[model]]`. Każdy model ma `id` (używane w `--model` i w nazwie katalogu z danymi), `model` (słowa, które muszą być w tytule) i opcjonalnie `nazwa` oraz dowolne pola profilu. Sekcje modelu zapisuje się jako `[model.olx]`, `[[model.sklep]]` itd. Bez `frazy` program użyje „marka model” i „halowki marka model”.
 
-Nike, Adidas i Puma robią te same modele na różne nawierzchnie, dlatego ich pliki mają `oznaczenia_hali`: wzorce typu `\bic\b`, `\bin\b`, „halówki”, „futsal”. Oferta z nazwą modelu, ale bez takiego oznaczenia trafia do sprawdzenia zamiast na listę pewnych. Modele halowe z natury (Gato, Top Sala, Truco) mają `oznaczenia_hali = []`.
+Nike i Adidas robią te same modele na różne nawierzchnie, dlatego ich pliki mają `oznaczenia_hali`: wzorce typu `\bic\b`, `\bin\b`, „halówki”, „futsal”. Oferta z nazwą modelu, ale bez takiego oznaczenia trafia do sprawdzenia zamiast na listę pewnych. Modele halowe z natury (Gato, Top Sala, Super Sala) mają `oznaczenia_hali = []`.
 
 Reguły dla modeli spoza Munich Continental i Joma Top Flex są na razie proste: nazwa, wykluczenia nawierzchni i lista innych modeli marki. Kody produktów warto dopisywać dopiero po sprawdzeniu ich na prawdziwych ofertach.
 
@@ -123,11 +122,21 @@ Każdy model ma osobną historię cen, odkryte sklepy i statystyki źródeł (`d
 
 ## Interfejs w przeglądarce (Szatnia)
 
-Szatnia prowadzi przez cztery kroki: marka, model, rozmiar (można kilka) i filtry (cena z gotowymi progami, tylko potwierdzony rozmiar, świeże dane, wybór źródeł). Na dole cały czas widać podsumowanie i przycisk „Szukaj ofert” (skrót Ctrl ↵, na Macu ⌘ ↵). Wybór zostaje w przeglądarce po odświeżeniu strony.
+Szatnia prowadzi przez cztery kroki: marka, model, rozmiar (można kilka) i filtry (cena z progami 200, 300, 400 i 500 zł, tylko potwierdzony rozmiar, świeże dane, wybór źródeł). Podczas przewijania na dole ekranu jest przypięty pasek z podsumowaniem i przyciskiem „Szukaj ofert” (skrót Ctrl ↵, na Macu ⌘ ↵). Na końcu filtrów pasek płynnie wsiada w stronę jako jej zwykły element, a po przewinięciu w górę wraca na dół ekranu. Wybór zostaje w przeglądarce po odświeżeniu strony.
+
+Kilka rozmiarów naraz to kolejne przejścia tego samego wyszukiwania. Większość stron z pierwszego przejścia jest już w pamięci podręcznej, więc drugi rozmiar idzie kilka razy szybciej (w teście: 42 w 35 s, 43 w 10 s).
 
 W trakcie szukania widać pasek postępu, stan każdego źródła i oferty, które spływają od razu, gdy źródło skończy. W scenie 3D każde źródło to świecąca kula na orbicie wokół buta: pulsuje, gdy trwa sprawdzanie, a potem zmienia kolor (zielony gotowe, żółty wstrzymane lub podejrzane, czerwony błąd). „Przerwij szukanie” (albo Esc) zatrzymuje wszystko w około sekundę, także w trakcie odstępów między zapytaniami. Wyniki ze źródeł, które zdążyły, zostają zapisane.
 
 Wyniki są w trzech grupach (potwierdzony rozmiar, rozmiar do sprawdzenia, model do sprawdzenia na zdjęciu), z zakładką dla każdego rozmiaru, filtrem źródła, sortowaniem i stronicowaniem po 12. Nad listą jest blok „Od ostatniego sprawdzenia” (nowe, tańsze, droższe, które zniknęły), a karty mają znaczki „nowa” i „taniej o X zł”. Przycisk „Ukryj” chowa ofertę od razu i zapisuje ją w `ukryte.txt`, a powiadomienie pozwala to cofnąć. Na końcu są linki do stron, które trzeba sprawdzić ręcznie.
+
+Własne modele dodaje tylko administrator. Najpierw ustaw hasło (zapisuje się jako skrót argon2 w `.env`):
+
+```bash
+py serwer.py --ustaw-haslo
+```
+
+Potem zaloguj się na stronie `/admin.html`. Po zalogowaniu w kroku „Model” pojawi się przycisk „Dodaj własny model”. Logowanie ma limit 5 prób na 15 minut, a sesja trwa 12 godzin (ciasteczko HttpOnly, SameSite=Strict). Bez zalogowania serwer odrzuca dodawanie i usuwanie modeli.
 
 Własny model spoza katalogu dodasz przyciskiem „Dodaj własny model” w kroku „Model”. Podajesz markę (także nową), nazwę modelu i słowa do pominięcia, np. rebound albo jr, z gotowymi podpowiedziami. Model od razu trafia do katalogu i można go wyszukać. Własne modele są w `dane/wlasne_modele.json`, a usuwa się je w tym samym oknie, z potwierdzeniem.
 
@@ -179,6 +188,8 @@ Obok kroków stoi scena 3D (Three.js): stylizowany but zbudowany w kodzie, bez c
 
 ### Prawdziwy model 3D buta
 
+Scena pokazuje prawdziwe modele: na starcie losowy, po wyborze marki losowy z tej marki, a po wyborze linii jej własny model. But stylizowany zostaje tylko wtedy, gdy nie ma żadnego pliku GLB (np. w świeżej kopii repozytorium).
+
 Zamiast stylizowanego buta scena może pokazać prawdziwy model. Wystarczy plik `interfejs/public/modele/<marka>-<model>.glb`, np. `munich-continental.glb`. Te pliki są w `.gitignore`, bo powstają z prywatnych zdjęć. Serwer sam go wykryje, a scena wczyta go po wybraniu tego modelu. Program sam ustawia but: obraca go wzdłuż, skaluje do długości rozmiaru 42, stawia na podłodze i odwraca, jeśli pięta wypadła z przodu. Modele bez pliku i uszkodzone pliki dostają but stylizowany.
 
 Model powstaje z Twoich zdjęć (generator AI). Jak je zrobić:
@@ -187,7 +198,37 @@ Model powstaje z Twoich zdjęć (generator AI). Jak je zrobić:
 2. Gładkie, kontrastowe tło (jasne dla ciemnego buta, ciemne dla jasnego), światło dzienne, bez lampy błyskowej i ostrych cieni.
 3. Cztery zdjęcia z wysokości buta, z tej samej odległości: bok zewnętrzny, bok wewnętrzny, przód (nosek) i tył (pięta).
 4. Cały but w kadrze, zajmuje ok. 70% zdjęcia, ostry, bez rąk i innych przedmiotów.
-5. Zdjęcia w pełnej rozdzielczości (JPG lub PNG) w katalogu `models/<marka>/<model>/`, np. `models/munich/continental/` albo `models/nike/tiempo/`. Katalogi dla wszystkich 36 modeli z katalogu już są. Cały `models/` jest w `.gitignore`.
+5. Zdjęcia w pełnej rozdzielczości (JPG lub PNG) w katalogu `models/<marka>/<model>/`, np. `models/munich/continental/` albo `models/nike/phantom/`. Katalogi dla wszystkich modeli z katalogu już są. Cały `models/` jest w `.gitignore`.
+
+### Generowanie modeli 3D ze zdjęć
+
+Narzędzie `narzedzia/modele3d/generuj.py` wysyła wybrane zdjęcia każdego modelu (lista w `wybor_zdjec.json`, tylko ujęcia jednego buta, bez par i zdjęć na nodze) do generatora TRELLIS na Hugging Face. Usuwa tło, które generator odtwarza pod butem jako „podłogę”, kompresuje plik (meshopt i tekstury WebP, ok. 130–280 KB) i zapisuje go w `interfejs/public/modele/`. Gotowe modele pomija, więc można je uruchamiać codziennie, aż będą wszystkie.
+
+Token Hugging Face (typ Read, z huggingface.co/settings/tokens) wpisz do `.env` jako `HF_TOKEN=...`. Darmowe konto pozwala na ok. 5 modeli dziennie, a konto PRO na ok. 25 minut GPU dziennie.
+
+```bash
+python3.12 -m venv narzedzia/modele3d/.venv
+```
+
+```bash
+narzedzia/modele3d/.venv/bin/pip install -r narzedzia/modele3d/requirements.txt
+```
+
+```bash
+narzedzia/modele3d/.venv/bin/python narzedzia/modele3d/generuj.py
+```
+
+Pojedynczy model: `generuj.py nike/gato`. Ponowne wygenerowanie istniejącego: `--od-nowa`. Lista brakujących: `--brakujace`.
+
+Na tym komputerze działa codzienne zadanie macOS `pl.szatnia.modele3d` (`~/Library/LaunchAgents/pl.szatnia.modele3d.plist`). Codziennie o 2:00 (albo po wybudzeniu komputera) uruchamia `narzedzia/modele3d/codziennie.sh`, a ten generuje brakujące modele, aż skończy się dzienny limit. Po zrobieniu ostatniego modelu zadanie samo się usuwa. Przebieg zapisuje się w `narzedzia/modele3d/generuj.log`. Żeby wyłączyć je wcześniej:
+
+```bash
+launchctl bootout gui/$(id -u)/pl.szatnia.modele3d
+```
+
+```bash
+rm ~/Library/LaunchAgents/pl.szatnia.modele3d.plist
+```
 
 ## Serwer API (dla interfejsu w przeglądarce)
 
@@ -209,9 +250,12 @@ Serwer działa tylko lokalnie pod `http://127.0.0.1:8765`. Opis wszystkich adres
 | `POST /api/wyszukiwania/{id}/przerwij` | przerywa wyszukiwanie; bieżący rozmiar kończy się wynikami częściowymi, kolejne są pomijane |
 | `POST /api/ukryte` | ukrywa ofertę, body `{"url": "..."}` |
 | `POST /api/ukryte/przywroc` | cofa ukrycie oferty, body `{"url": "..."}` |
+| `GET /api/admin` | czy przeglądarka jest zalogowana jako administrator |
+| `POST /api/admin/logowanie` | logowanie administratora, body `{"haslo": "..."}` |
+| `POST /api/admin/wylogowanie` | wylogowanie |
 | `GET /api/wlasne` | lista własnych modeli |
-| `POST /api/wlasne` | dodaje własny model, body `{"marka", "model", "wykluczenia", "opis", "wymagaj_oznaczenia_hali"}` |
-| `DELETE /api/wlasne/{marka}/{model}` | usuwa własny model |
+| `POST /api/wlasne` | dodaje własny model (tylko administrator), body `{"marka", "model", "wykluczenia", "opis", "wymagaj_oznaczenia_hali"}` |
+| `DELETE /api/wlasne/{marka}/{model}` | usuwa własny model (tylko administrator) |
 
 Przykład startu wyszukiwania dwóch rozmiarów w dwóch źródłach:
 

@@ -61,6 +61,19 @@
   color: var(--kolor-akcent-mocny);
 }
 
+.logowanie__forma,
+.logowanie__zalogowany {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--odstep-4);
+  max-width: 420px;
+}
+
+.logowanie__forma .pole-formularza {
+  align-self: stretch;
+}
+
 .uzupelnij {
   padding: 0 var(--odstep-1);
   border-radius: var(--promien-maly);

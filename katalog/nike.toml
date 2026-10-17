@@ -1,46 +1,41 @@
 marka = "Nike"
 opis_wykluczen = "tylko wersje halowe (IC), bez korków i turfów"
 wykluczenia = ['\bfg\b', '\bag\b', '\bsg\b', '\bmg\b', '\btf\b', 'turf']
-inne_modele = ["premier"]
+inne_modele = ["premier", "tiempo", "mercurial", "vapor", "superfly"]
 oznaczenia_hali = ['\bic\b', 'indoor', 'halow', 'na hal', 'futsal', 'sala\b', 'hallen', 'zaal', 'salle']
-
-[[model]]
-id = "tiempo"
-model = "Tiempo"
-nazwa = "Nike Tiempo IC"
-frazy = ["nike tiempo ic", "halowki nike tiempo"]
-
-[[model]]
-id = "phantom"
-model = "Phantom"
-nazwa = "Nike Phantom IC"
-frazy = ["nike phantom ic", "halowki nike phantom"]
-
-[[model]]
-id = "mercurial-vapor"
-model = "Vapor"
-nazwa = "Nike Mercurial Vapor IC"
-frazy = ["nike mercurial vapor ic", "halowki nike mercurial vapor"]
-
-[[model]]
-id = "mercurial-superfly"
-model = "Superfly"
-nazwa = "Nike Mercurial Superfly IC"
-frazy = ["nike mercurial superfly ic", "halowki nike mercurial superfly"]
-
-[[model]]
-id = "lunar-gato"
-model = "Lunar Gato"
-nazwa = "Nike Lunar Gato II"
-oznaczenia_hali = []
 
 [[model]]
 id = "streetgato"
 model = "Streetgato"
+nazwa = "Nike Tiempo Streetgato"
 oznaczenia_hali = []
-frazy = ["nike streetgato", "halowki nike streetgato"]
+frazy = ["nike streetgato", "nike tiempo streetgato", "halowki nike streetgato"]
 
 [[model]]
 id = "react-gato"
 model = "React Gato"
+nazwa = "Nike Tiempo Reactgato"
 oznaczenia_hali = []
+frazy = ["nike react gato", "nike tiempo reactgato", "halowki nike react gato"]
+
+[[model]]
+id = "phantom"
+model = "Phantom"
+nazwa = "Nike Phantom"
+frazy = ["nike phantom ic", "halowki nike phantom"]
+
+[[model]]
+id = "gato"
+model = "Gato"
+nazwa = "Nike Gato"
+oznaczenia_hali = []
+opis_wykluczen = "bez Lunargato, Streetgato i Reactgato"
+wykluczenia = ['\blunar', '\breact', '\bstreet']
+frazy = ["nike gato", "halowki nike gato"]
+
+[[model]]
+id = "lunar-gato"
+model = "Lunar Gato"
+nazwa = "Nike Lunargato II"
+oznaczenia_hali = []
+frazy = ["nike lunar gato", "nike lunargato", "halowki nike lunar gato"]

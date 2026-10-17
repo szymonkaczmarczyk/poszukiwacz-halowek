@@ -4,14 +4,16 @@ import threading
 import time
 import uuid
 from collections import OrderedDict
+from urllib.parse import urlsplit
 from typing import Annotated
 
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, Response, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
+from . import admin as A
 from . import katalog, przebieg, ukryte, wlasne
 from . import ustawienia as U
 
@@ -31,7 +33,7 @@ NAGLOWKI_BEZPIECZENSTWA = {
     "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
     "Content-Security-Policy": (
         "default-src 'self'; img-src 'self' https: data: blob:; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; "
-        "font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+        "font-src 'self'; connect-src 'self' blob:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
     ),
 }
 
@@ -62,6 +64,12 @@ class NowyModel(BaseModel):
     wykluczenia: list[Annotated[str, Field(min_length=1, max_length=30, pattern=WZOR_SLOWA)]] = Field(default_factory=list, max_length=15)
     opis: str = Field(default="", max_length=120)
     wymagaj_oznaczenia_hali: bool = True
+
+
+class Logowanie(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    haslo: str = Field(min_length=1, max_length=200)
 
 
 class DoUkrycia(BaseModel):
@@ -211,18 +219,24 @@ def _opis_katalogu():
     }
 
 
-def utworz(wykonaj=przebieg.wykonaj, hosty=HOSTY, interfejs=None):
+def utworz(wykonaj=przebieg.wykonaj, hosty=HOSTY, interfejs=None, administrator=None):
     interfejs = U.KATALOG_INTERFEJSU if interfejs is None else interfejs
     przebieg.wczytaj_env()
     app = FastAPI(title="Szatnia API", docs_url="/api/dokumentacja", redoc_url=None, openapi_url="/api/openapi.json")
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=list(hosty))
     menedzer = Menedzer(wykonaj)
+    administrator = administrator or A.Administrator()
+
+    def wymagaj_admina(request: Request):
+        if not administrator.sprawdz(request.cookies.get(A.CIASTKO)):
+            raise HTTPException(401, "tylko administrator może zmieniać modele, zaloguj się na stronie /admin.html")
     app.state.menedzer = menedzer
 
     @app.middleware("http")
     async def ochrona(request: Request, nastepny):
         zrodlo = request.headers.get("origin")
-        if zrodlo and zrodlo not in DOZWOLONE_ZRODLA_STRON:
+        ta_sama_strona = zrodlo and urlsplit(zrodlo).netloc == request.headers.get("host")
+        if zrodlo and not ta_sama_strona and zrodlo not in DOZWOLONE_ZRODLA_STRON:
             return JSONResponse({"detail": "żądanie z obcej strony"}, status_code=403)
         odpowiedz = await nastepny(request)
         odpowiedz.headers.update(NAGLOWKI_BEZPIECZENSTWA)
@@ -251,11 +265,36 @@ def utworz(wykonaj=przebieg.wykonaj, hosty=HOSTY, interfejs=None):
         except (OSError, ValueError) as e:
             raise HTTPException(404, "ten model w tym rozmiarze nie był jeszcze szukany") from e
 
+    @app.get("/api/admin")
+    def stan_admina(request: Request):
+        return {"zalogowany": administrator.sprawdz(request.cookies.get(A.CIASTKO)), "skonfigurowany": administrator.skonfigurowany}
+
+    @app.post("/api/admin/logowanie")
+    def logowanie(dane: Logowanie, request: Request):
+        if not administrator.skonfigurowany:
+            raise HTTPException(503, "hasło administratora nie jest ustawione, uruchom: py serwer.py --ustaw-haslo")
+        try:
+            token = administrator.zaloguj(dane.haslo, request.client.host if request.client else "?")
+        except A.ZaDuzoProb as e:
+            raise HTTPException(429, "za dużo prób logowania, spróbuj za 15 minut") from e
+        if not token:
+            raise HTTPException(401, "nieprawidłowe hasło")
+        odpowiedz = JSONResponse({"zalogowany": True})
+        odpowiedz.set_cookie(A.CIASTKO, token, max_age=A.CZAS_SESJI, httponly=True, samesite="strict", secure=request.url.scheme == "https", path="/")
+        return odpowiedz
+
+    @app.post("/api/admin/wylogowanie")
+    def wylogowanie(request: Request):
+        administrator.wyloguj(request.cookies.get(A.CIASTKO))
+        odpowiedz = JSONResponse({"zalogowany": False})
+        odpowiedz.delete_cookie(A.CIASTKO, path="/")
+        return odpowiedz
+
     @app.get("/api/wlasne")
     def lista_wlasnych():
         return wlasne.wczytaj()
 
-    @app.post("/api/wlasne", status_code=201)
+    @app.post("/api/wlasne", status_code=201, dependencies=[Depends(wymagaj_admina)])
     def dodaj_wlasny(nowy: NowyModel):
         try:
             marka_id, model_id = wlasne.dodaj(nowy.marka, nowy.model, nowy.wykluczenia, nowy.opis, nowy.wymagaj_oznaczenia_hali, katalog.marki())
@@ -263,7 +302,7 @@ def utworz(wykonaj=przebieg.wykonaj, hosty=HOSTY, interfejs=None):
             raise HTTPException(e.kod, str(e)) from e
         return {"marka": marka_id, "model": model_id}
 
-    @app.delete("/api/wlasne/{marka}/{model}", status_code=204)
+    @app.delete("/api/wlasne/{marka}/{model}", status_code=204, dependencies=[Depends(wymagaj_admina)])
     def usun_wlasny(marka: str, model: str):
         if not wlasne.usun(marka, model):
             raise HTTPException(404, "nie ma takiego własnego modelu")

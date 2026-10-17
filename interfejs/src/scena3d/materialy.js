@@ -8,7 +8,6 @@ export const ZESTAWY = {
   joma: { cholewka: "#203062", nosek: "#1a2850", zapietek: "#eeede8", pas: "#eeede8", podeszwa: "#b77a40", sznurowki: "#eeede8", szorstkosc: 0.8, polysk: 0.25 },
   nike: { cholewka: "#18181b", nosek: "#202024", zapietek: "#18181b", pas: "#d9e44a", podeszwa: "#a8743f", sznurowki: "#ecece6", szorstkosc: 0.5, polysk: 0.2 },
   adidas: { cholewka: "#f2f1ec", nosek: "#e8e6df", zapietek: "#141416", pas: "#141416", podeszwa: "#c08a52", sznurowki: "#f6f5f0", szorstkosc: 0.45, polysk: 0.1 },
-  puma: { cholewka: "#141416", nosek: "#1e1e22", zapietek: "#1e1e22", pas: "#efefea", podeszwa: "#2b2b30", sznurowki: "#efefea", szorstkosc: 0.55, polysk: 0.3 },
   mizuno: { cholewka: "#1f4fb8", nosek: "#1a45a3", zapietek: "#f3f3ef", pas: "#f3f3ef", podeszwa: "#ecebe6", sznurowki: "#f3f3ef", szorstkosc: 0.4, polysk: 0.1 },
 };
 

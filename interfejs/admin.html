@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0e0e10">
+<title>Logowanie administratora - Szatnia</title>
+<meta name="description" content="Logowanie administratora Szatni. Tylko administrator dodaje i usuwa własne modele butów.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<script type="module" src="/src/admin.js"></script>
+</head>
+<body class="strona">
+<header class="naglowek">
+  <a class="naglowek__wroc" href="/"><span data-ikona="ArrowLeft"></span>Wróć do Szatni</a>
+</header>
+<main class="tekst-prawny logowanie">
+  <h1>Logowanie administratora</h1>
+  <p id="logowanie-opis">Po zalogowaniu w kroku „Model” pojawi się przycisk „Dodaj własny model”.</p>
+  <form class="logowanie__forma" id="logowanie" novalidate>
+    <div class="pole-formularza">
+      <label class="pole-formularza__etykieta" for="haslo">Hasło</label>
+      <input id="haslo" name="haslo" type="password" autocomplete="current-password" required aria-describedby="haslo-blad">
+      <p class="komunikat-bledu" id="haslo-blad" aria-live="polite" hidden></p>
+    </div>
+    <button class="przycisk przycisk--glowny" type="submit" id="zaloguj">Zaloguj się</button>
+  </form>
+  <div class="logowanie__zalogowany" id="zalogowany" hidden>
+    <p>Jesteś zalogowany jako administrator.</p>
+    <div class="blad-404__akcje">
+      <a class="przycisk przycisk--glowny" href="/#krok-model">Przejdź do modeli<span data-ikona="ArrowRight"></span></a>
+      <button class="przycisk" type="button" id="wyloguj">Wyloguj się</button>
+    </div>
+  </div>
+</main>
+</body>
+</html>

@@ -15,6 +15,7 @@ export default defineConfig({
         brak: "404.html",
         polityka: "polityka-prywatnosci.html",
         regulamin: "regulamin.html",
+        admin: "admin.html",
       },
     },
   },

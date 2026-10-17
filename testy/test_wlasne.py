@@ -5,6 +5,7 @@ from unittest import mock
 
 from fastapi.testclient import TestClient
 
+from szukacz import admin as A
 from szukacz import api, katalog
 from szukacz import profil as P
 from szukacz import ustawienia as U
@@ -16,7 +17,9 @@ class WlasneTest(unittest.TestCase):
         self.katalog = tempfile.TemporaryDirectory()
         self.latka = mock.patch.object(U, "PLIK_WLASNYCH", Path(self.katalog.name) / "wlasne.json")
         self.latka.start()
-        self.klient = TestClient(api.utworz(lambda *a: None, api.HOSTY + ["testserver"]))
+        administrator = A.Administrator(A.hash_hasla("haslo-testowe-123"))
+        self.klient = TestClient(api.utworz(lambda *a: None, api.HOSTY + ["testserver"], Path("/nie-ma"), administrator))
+        self.assertEqual(self.klient.post("/api/admin/logowanie", json={"haslo": "haslo-testowe-123"}).status_code, 200)
 
     def tearDown(self):
         self.latka.stop()
@@ -61,9 +64,9 @@ class WlasneTest(unittest.TestCase):
             self.assertEqual(self.klient.post("/api/wlasne", json=zapytanie).status_code, 422, zapytanie)
 
     def test_usuwanie_tylko_wlasnych(self):
-        self.klient.post("/api/wlasne", json={"marka": "puma", "model": "Vitoria"})
-        self.assertEqual(self.klient.delete("/api/wlasne/puma/vitoria").status_code, 204)
-        self.assertEqual(self.klient.delete("/api/wlasne/puma/vitoria").status_code, 404)
+        self.klient.post("/api/wlasne", json={"marka": "mizuno", "model": "Vitoria"})
+        self.assertEqual(self.klient.delete("/api/wlasne/mizuno/vitoria").status_code, 204)
+        self.assertEqual(self.klient.delete("/api/wlasne/mizuno/vitoria").status_code, 404)
         self.assertEqual(self.klient.delete("/api/wlasne/munich/continental").status_code, 404)
         self.assertEqual(self.klient.get("/api/wlasne").json(), [])
 

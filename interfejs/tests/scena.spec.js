@@ -46,19 +46,19 @@ async function podepnijModel3d(page, odpowiedz) {
   await page.route("**/modele/testowy.glb", odpowiedz);
 }
 
-test("model z plikiem GLB pokazuje prawdziwy but, inny wraca do stylizowanego", async ({ page }) => {
+test("model z plikiem GLB pokazuje prawdziwy but, a model bez pliku dostaje losowy model marki", async ({ page }) => {
   const bledy = [];
   page.on("pageerror", (blad) => bledy.push(blad.message));
   await podepnijModel3d(page, (route) => route.fulfill({ path: "tests/zasoby/but-testowy.glb", contentType: "model/gltf-binary" }));
   await page.goto("/");
   const scena = page.locator(".scena");
   await expect(scena).toHaveAttribute("data-tryb", "3d", { timeout: 15000 });
-  await expect(scena).toHaveAttribute("data-model3d", "stylizowany");
+  await expect(scena).toHaveAttribute("data-model3d", "prawdziwy", { timeout: 15000 });
   await page.locator("#lista-marek").getByRole("radio", { name: /^Joma \d+ model/ }).click();
-  await page.locator("#lista-modeli").getByRole("radio", { name: /^Joma Top Flex bez Rebound/ }).click();
+  await page.locator("#lista-modeli").getByRole("radio", { name: /^Joma Top Flex/ }).click();
   await expect(scena).toHaveAttribute("data-model3d", "prawdziwy", { timeout: 15000 });
   await page.locator("#lista-modeli").getByRole("radio", { name: /^Joma Mundial/ }).click();
-  await expect(scena).toHaveAttribute("data-model3d", "stylizowany");
+  await expect(scena).toHaveAttribute("data-model3d", "prawdziwy");
   expect(bledy).toEqual([]);
 });
 
@@ -68,6 +68,6 @@ test("uszkodzony plik GLB zostawia stylizowany but", async ({ page }) => {
   const scena = page.locator(".scena");
   await expect(scena).toHaveAttribute("data-tryb", "3d", { timeout: 15000 });
   await page.locator("#lista-marek").getByRole("radio", { name: /^Joma \d+ model/ }).click();
-  await page.locator("#lista-modeli").getByRole("radio", { name: /^Joma Top Flex bez Rebound/ }).click();
+  await page.locator("#lista-modeli").getByRole("radio", { name: /^Joma Top Flex/ }).click();
   await expect(scena).toHaveAttribute("data-model3d", "stylizowany", { timeout: 15000 });
 });

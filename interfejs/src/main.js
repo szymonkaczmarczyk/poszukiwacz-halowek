@@ -135,7 +135,7 @@ async function uruchom() {
   pokazLiczby(katalog);
 
   const marki = krokMarka($("krok-marka"), $("lista-marek"), katalog);
-  const modele = krokModel($("krok-model"), $("lista-modeli"), $("model-opis"), katalog);
+  const modele = krokModel($("krok-model"), $("lista-modeli"), katalog);
   const edytor = edytorModelu(katalog, {
     naZmiane: async ({ dodany, usuniety }) => {
       const nowy = await api.katalog();
@@ -149,16 +149,22 @@ async function uruchom() {
       else if (usuniety && stan.marka === usuniety.marka && stan.model === usuniety.model) zmien({ model: null });
     },
   });
-  $("lista-modeli").after(
-    el("button", { type: "button", class: "przycisk przycisk--maly krok__wlasny", onClick: () => edytor.otworz() }, ikona("Plus"), "Dodaj własny model"),
-  );
+  api
+    .stanAdmina()
+    .then(({ zalogowany }) => {
+      if (!zalogowany) return;
+      $("lista-modeli").after(
+        el("button", { type: "button", class: "przycisk przycisk--maly krok__wlasny", onClick: () => edytor.otworz() }, ikona("Plus"), "Dodaj własny model"),
+      );
+    })
+    .catch(() => null);
   krokRozmiar($("krok-rozmiar"), $("lista-rozmiarow"), $("rozmiar-podpowiedz"), katalog.rozmiary);
   krokFiltry($("filtry"));
   scena(katalog);
   szyna();
 
   const sterowanie = pasek(
-    { element: $("pasek"), wybor: $("pasek-wybor"), brak: $("pasek-brak"), przycisk: $("szukaj"), skrot: $("skrot") },
+    { element: $("pasek"), wybor: $("pasek-wybor"), brak: $("pasek-brak"), przycisk: $("szukaj"), skrot: $("skrot"), kotwica: $("pasek-kotwica") },
     katalog,
     (stan) => {
       sterowanie.ustawTrwa(true);

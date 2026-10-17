@@ -151,9 +151,25 @@ export function uruchomScene3d(kontener, katalog) {
   let prawdziwy = null;
   let zadanyAdres = null;
 
+  let pokazanyAdres = null;
+
+  function losowy(adresy) {
+    const inne = adresy.filter((a) => a !== pokazanyAdres);
+    const pula = inne.length ? inne : adresy;
+    return pula.length ? pula[Math.floor(Math.random() * pula.length)] : null;
+  }
+
+  function adresyMarki(marka) {
+    return (marka?.modele || []).map((m) => m.model3d).filter(Boolean);
+  }
+
   function adresModelu3d(stan) {
     const marka = katalog.marki.find((m) => m.id === stan.marka);
-    return marka?.modele.find((m) => m.id === stan.model)?.model3d || null;
+    const wlasny = marka?.modele.find((m) => m.id === stan.model)?.model3d;
+    if (wlasny) return wlasny;
+    const zMarki = adresyMarki(marka);
+    if (stan.model && zMarki.includes(pokazanyAdres)) return pokazanyAdres;
+    return losowy(zMarki) || losowy(katalog.marki.flatMap(adresyMarki));
   }
 
   function pokaz(obiekt, widoczny) {
@@ -175,9 +191,11 @@ export function uruchomScene3d(kontener, katalog) {
   async function ustawPrawdziwy(adres) {
     zadanyAdres = adres;
     if (!adres) {
+      pokazanyAdres = null;
       pokazStylizowany();
       return;
     }
+    if (adres === pokazanyAdres && prawdziwy?.visible) return;
     kontener.dataset.model3d = "ladowanie";
     try {
       const obiekt = await wczytajPrawdziwy(adres);
@@ -190,6 +208,7 @@ export function uruchomScene3d(kontener, katalog) {
       if (!obiekt.parent) os.add(obiekt);
       if (but.visible) pokaz(but, false);
       pokaz(obiekt, true);
+      pokazanyAdres = adres;
       kontener.dataset.model3d = "prawdziwy";
     } catch {
       if (zadanyAdres === adres) pokazStylizowany();
@@ -279,8 +298,14 @@ export function uruchomScene3d(kontener, katalog) {
   });
 
   kontener.dataset.tryb = "3d";
-  kontener.dataset.model3d = "stylizowany";
-  ustawPrawdziwy(adresModelu3d(stan0));
+  const poczatkowy = adresModelu3d(stan0);
+  if (poczatkowy) {
+    but.visible = false;
+    kontener.dataset.model3d = "ladowanie";
+  } else {
+    kontener.dataset.model3d = "stylizowany";
+  }
+  ustawPrawdziwy(poczatkowy);
   gsap.fromTo(renderer.domElement, { opacity: 0 }, { opacity: 1, duration: 1.2, ease: "power2.out" });
   return { ustawUjecie };
 }

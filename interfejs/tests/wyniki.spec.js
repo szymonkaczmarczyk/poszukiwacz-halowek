@@ -38,7 +38,7 @@ async function przygotuj(page, zdarzenia) {
   await page.goto("/");
   await expect(page.locator("#status-api")).toHaveAttribute("data-stan", "ok");
   await page.locator("#lista-marek").getByRole("radio", { name: /^Joma \d+ model/ }).click();
-  await page.locator("#lista-modeli").getByRole("radio", { name: /^Joma Top Flex bez Rebound/ }).click();
+  await page.locator("#lista-modeli").getByRole("radio", { name: "Joma Top Flex", exact: true }).click();
 }
 
 const PELNE = [
@@ -133,7 +133,7 @@ test("przerwanie wysyła żądanie i pokazuje wyniki częściowe", async ({ page
   await page.goto("/");
   await expect(page.locator("#status-api")).toHaveAttribute("data-stan", "ok");
   await page.locator("#lista-marek").getByRole("radio", { name: /^Joma \d+ model/ }).click();
-  await page.locator("#lista-modeli").getByRole("radio", { name: /^Joma Top Flex bez Rebound/ }).click();
+  await page.locator("#lista-modeli").getByRole("radio", { name: "Joma Top Flex", exact: true }).click();
   await page.getByRole("button", { name: "Rozmiar 41" }).click();
   await page.getByRole("button", { name: /Szukaj ofert/ }).click();
   await expect(page.locator('.zrodlo[data-stan="trwa"]')).toContainText("OLX");

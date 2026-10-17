@@ -52,6 +52,18 @@ export function przywroc(url) {
   return wyslijAdres("/api/ukryte/przywroc", url);
 }
 
+export function stanAdmina() {
+  return zapytanie("/api/admin");
+}
+
+export function zalogujAdmina(haslo) {
+  return zapytanie("/api/admin/logowanie", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ haslo }) });
+}
+
+export function wylogujAdmina() {
+  return zapytanie("/api/admin/wylogowanie", { method: "POST" });
+}
+
 export function dodajWlasny(dane) {
   return zapytanie("/api/wlasne", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(dane) });
 }

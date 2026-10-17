@@ -117,7 +117,7 @@ def _sklepy(*poziomy):
 
 def _inne_modele(marka, model):
     wlasna = model.dane["model"].lower()
-    nazwy = list(marka.dane.get("inne_modele", []))
+    nazwy = [n for n in marka.dane.get("inne_modele", []) if n.lower() != wlasna]
     for m in marka.modele:
         nazwa = m.dane["model"].lower()
         if m is not model and nazwa != wlasna and nazwa not in nazwy:

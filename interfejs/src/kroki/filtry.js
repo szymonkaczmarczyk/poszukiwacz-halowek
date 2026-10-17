@@ -4,7 +4,7 @@ import { ikona } from "../ikony.js";
 import { pobierz, subskrybuj, zmien } from "../stan.js";
 import { pojawienie } from "../ruch.js";
 
-const PROGI_CENY = [200, 300, 400];
+const PROGI_CENY = [200, 300, 400, 500];
 const POWODY_NIEDOSTEPNOSCI = {
   eBay: "wymaga klucza eBay API w pliku .env",
   "Odkrywanie (Google)": "wymaga klucza SerpAPI w pliku .env",

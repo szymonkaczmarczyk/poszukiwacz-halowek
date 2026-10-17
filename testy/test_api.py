@@ -35,7 +35,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(dane["rozmiary"][0], "38")
         self.assertEqual(dane["rozmiary"][-1], "46")
         marki = {m["id"]: m for m in dane["marki"]}
-        self.assertEqual(set(marki), {"adidas", "joma", "mizuno", "munich", "nike", "puma"})
+        self.assertEqual(set(marki), {"adidas", "joma", "mizuno", "munich", "nike"})
         self.assertIn("continental", [m["id"] for m in marki["munich"]["modele"]])
 
     def test_katalog_podaje_plik_3d_tylko_gdy_istnieje(self):
@@ -56,6 +56,7 @@ class ApiTest(unittest.TestCase):
             self.assertEqual(glowna.status_code, 200)
             self.assertIn("Szatnia", glowna.text)
             self.assertIn("frame-ancestors 'none'", glowna.headers["content-security-policy"])
+            self.assertIn("connect-src 'self' blob:", glowna.headers["content-security-policy"])
             brak = k.get("/nie-ma-takiej-strony")
             self.assertEqual(brak.status_code, 404)
             self.assertIn("Tej strony nie ma", brak.text)
@@ -72,7 +73,7 @@ class ApiTest(unittest.TestCase):
 
     def test_pelne_wyszukiwanie_ze_strumieniem(self):
         k = self.klient()
-        odp = k.post("/api/wyszukiwania", json={"marka": "nike", "model": "tiempo", "rozmiary": ["43", "41", "43"]})
+        odp = k.post("/api/wyszukiwania", json={"marka": "nike", "model": "phantom", "rozmiary": ["43", "41", "43"]})
         self.assertEqual(odp.status_code, 202)
         opis = odp.json()
         self.assertEqual(opis["rozmiary"], ["41", "43"])
@@ -122,10 +123,10 @@ class ApiTest(unittest.TestCase):
     def test_walidacja_wejscia(self):
         k = self.klient()
         zle = [
-            {"marka": "nike", "model": "tiempo", "rozmiary": ["50"]},
-            {"marka": "nike", "model": "tiempo", "rozmiary": []},
-            {"marka": "nike", "model": "tiempo", "rozmiary": ["42"], "max_cena": -5},
-            {"marka": "nike", "model": "tiempo", "rozmiary": ["42"], "rola": "admin"},
+            {"marka": "nike", "model": "phantom", "rozmiary": ["50"]},
+            {"marka": "nike", "model": "phantom", "rozmiary": []},
+            {"marka": "nike", "model": "phantom", "rozmiary": ["42"], "max_cena": -5},
+            {"marka": "nike", "model": "phantom", "rozmiary": ["42"], "rola": "admin"},
         ]
         for zapytanie in zle:
             self.assertEqual(k.post("/api/wyszukiwania", json=zapytanie).status_code, 422, zapytanie)
@@ -135,6 +136,8 @@ class ApiTest(unittest.TestCase):
         k = self.klient()
         self.assertEqual(k.get("/api/katalog", headers={"Origin": "https://zla-strona.example"}).status_code, 403)
         self.assertEqual(k.get("/api/katalog", headers={"Origin": "http://localhost:5190"}).status_code, 200)
+        self.assertEqual(k.get("/api/katalog", headers={"Origin": "http://testserver"}).status_code, 200)
+        self.assertEqual(k.get("/api/katalog", headers={"Origin": "http://testserver.zla-strona.example"}).status_code, 403)
         self.assertEqual(TestClient(api.utworz(udawane_wykonaj)).get("/api/katalog").status_code, 400)
         odp = k.get("/api/zdrowie")
         self.assertEqual(odp.headers["x-content-type-options"], "nosniff")
@@ -176,8 +179,8 @@ class ApiTest(unittest.TestCase):
 
     def test_ostatnie_wyniki_bez_danych(self):
         k = self.klient()
-        self.assertEqual(k.get("/api/katalog/mizuno/monarcida-sala/wyniki/39").status_code, 404)
-        self.assertEqual(k.get("/api/katalog/mizuno/monarcida-sala/wyniki/99").status_code, 404)
+        self.assertEqual(k.get("/api/katalog/mizuno/morelia-sala/wyniki/39").status_code, 404)
+        self.assertEqual(k.get("/api/katalog/mizuno/morelia-sala/wyniki/99").status_code, 404)
 
 
 if __name__ == "__main__":

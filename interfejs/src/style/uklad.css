@@ -174,3 +174,26 @@ main {
     --szerokosc-sceny: 44vw;
   }
 }
+
+.pasek-kotwica {
+  margin-top: var(--odstep-6);
+  max-width: 880px;
+}
+
+.pasek.pasek--przenoszony {
+  transition: none;
+}
+
+.pasek.pasek--zadokowany {
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  width: 100%;
+  transform: none;
+  visibility: visible;
+  box-shadow: none;
+  background: var(--kolor-powierzchnia);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}

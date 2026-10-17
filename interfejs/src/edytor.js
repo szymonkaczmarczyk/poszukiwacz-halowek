@@ -99,7 +99,7 @@ export function edytorModelu(katalog, { naZmiane }) {
       "label",
       { class: "przelacznik", for: "edytor-hala" },
       hala,
-      el("span", {}, "Tylko wersje halowe", el("span", { class: "przelacznik__opis" }, "Odrzuca ogłoszenia bez IC, IN, IT albo słowa „halówki” w tytule. Ma znaczenie dla Nike, Adidas i Puma.")),
+      el("span", {}, "Tylko wersje halowe", el("span", { class: "przelacznik__opis" }, "Odrzuca ogłoszenia bez IC, IN albo słowa „halówki” w tytule. Ma znaczenie dla Nike i Adidas.")),
     ),
     poleNotatki.element,
     el("footer", { class: "okno__stopka" }, wyslij),

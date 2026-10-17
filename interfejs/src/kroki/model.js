@@ -4,15 +4,7 @@ import { pobierz, subskrybuj, zmien } from "../stan.js";
 import { pojawienie, przewin, sprezyna } from "../ruch.js";
 import { opcjaWyboru, pokazDalej, przyciskDalej, zaznacz } from "./wspolne.js";
 
-function najczestszyOpis(modele) {
-  const liczniki = new Map();
-  for (const m of modele) liczniki.set(m.opis_wykluczen, (liczniki.get(m.opis_wykluczen) || 0) + 1);
-  const [opis, ile] = [...liczniki].sort((a, b) => b[1] - a[1])[0] || [];
-  return ile > 1 ? opis : "";
-}
-
-export function krokModel(sekcja, kontener, opisKroku, katalog) {
-  const domyslnyOpis = opisKroku.textContent;
+export function krokModel(sekcja, kontener, katalog) {
   const dalej = przyciskDalej("Dalej: rozmiar", "#krok-rozmiar");
   sekcja.append(dalej);
 
@@ -35,12 +27,9 @@ export function krokModel(sekcja, kontener, opisKroku, katalog) {
     const znaleziona = katalog.marki.find((m) => m.id === marka);
     pokazDalej(dalej, Boolean(model));
     if (!znaleziona) {
-      opisKroku.textContent = domyslnyOpis;
       wyczysc(kontener, pustyStan());
       return;
     }
-    const wspolnyOpis = najczestszyOpis(znaleziona.modele);
-    opisKroku.textContent = wspolnyOpis ? `${domyslnyOpis} Dla ${znaleziona.nazwa}: ${wspolnyOpis}.` : domyslnyOpis;
     wyczysc(
       kontener,
       znaleziona.modele.map((m) =>
@@ -49,7 +38,6 @@ export function krokModel(sekcja, kontener, opisKroku, katalog) {
           zaznaczona: m.id === model,
           naWybor: wybierz,
           nazwa: m.nazwa,
-          meta: [m.wlasny && "własny model", m.opis_wykluczen !== wspolnyOpis && m.opis_wykluczen].filter(Boolean).join(" · "),
         }),
       ),
     );

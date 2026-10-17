@@ -40,7 +40,7 @@ async function wybierzJomeTopFlex(page) {
   await page.goto("/");
   await expect(page.locator("#status-api")).toHaveAttribute("data-stan", "ok");
   await marka(page, "Joma").click();
-  await page.locator("#lista-modeli").getByRole("radio", { name: /^Joma Top Flex bez Rebound/ }).click();
+  await page.locator("#lista-modeli").getByRole("radio", { name: "Joma Top Flex", exact: true }).click();
   await page.getByRole("button", { name: "Rozmiar 41" }).click();
 }
 
@@ -48,11 +48,11 @@ test("strona startowa pokazuje dane z katalogu i CTA", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveTitle(/Szatnia/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Halówki w Twoim rozmiarze, od najtańszej oferty");
-  await expect(page.locator("#liczba-marek")).toHaveText("6");
-  await expect(page.locator("#liczba-modeli")).toHaveText("36");
+  await expect(page.locator("#liczba-marek")).toHaveText("5");
+  await expect(page.locator("#liczba-modeli")).toHaveText("23");
   await expect(page.locator("#zakres-rozmiarow")).toHaveText("38–46");
   await expect(page.getByRole("link", { name: "Wybierz but" })).toBeVisible();
-  await expect(page.getByRole("radio")).toHaveCount(6);
+  await expect(page.getByRole("radio")).toHaveCount(5);
 });
 
 test("pusty stan modelu prowadzi do wyboru marki", async ({ page }) => {
@@ -151,12 +151,12 @@ test("ograniczony ruch wyłącza płynne przewijanie, układ bez poziomego scrol
 });
 
 test("adres URL otwiera wybrany model i rozmiary, a zmiany trafiają do adresu", async ({ page }) => {
-  await page.goto("/?marka=nike&model=tiempo&rozmiar=44,43");
+  await page.goto("/?marka=nike&model=phantom&rozmiar=44,43");
   await expect(page.locator("#status-api")).toHaveAttribute("data-stan", "ok");
-  await expect(page.locator("#pasek-wybor")).toContainText("Nike Tiempo IC");
+  await expect(page.locator("#pasek-wybor")).toContainText("Nike Phantom");
   await expect(page.locator("#pasek-wybor")).toContainText("rozm. 43, 44");
   await page.getByRole("button", { name: "Rozmiar 45" }).click();
-  await expect(page).toHaveURL(/marka=nike&model=tiempo&rozmiar=43%2C44%2C45/);
+  await expect(page).toHaveURL(/marka=nike&model=phantom&rozmiar=43%2C44%2C45/);
   await page.getByRole("link", { name: "Wybierz but" }).click();
   await expect(page).toHaveURL(/\?marka=nike.*#krok-marka$/);
 });
@@ -166,4 +166,15 @@ test("nieznany model z adresu nie jest wybierany", async ({ page }) => {
   await expect(page.locator("#status-api")).toHaveAttribute("data-stan", "ok");
   await expect(page.locator("#pasek-brak")).toContainText("Wybierz model");
   await expect(page.locator("#pasek-brak")).toContainText("Zaznacz rozmiar");
+});
+
+test("pasek z przyciskiem szukania wsiada w stronę na końcu filtrów i wraca przy przewijaniu w górę", async ({ page }) => {
+  await page.goto("/?marka=munich&model=continental&rozmiar=42");
+  await expect(page.locator("#status-api")).toHaveAttribute("data-stan", "ok");
+  await expect(page.getByRole("button", { name: "do 500 zł" })).toBeVisible();
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+  await expect(page.locator("#pasek-kotwica #pasek")).toHaveClass(/pasek--zadokowany/);
+  await page.evaluate(() => document.getElementById("krok-model").scrollIntoView());
+  await expect(page.locator("body > #pasek")).not.toHaveClass(/pasek--zadokowany/);
+  await expect(page.locator("#pasek")).toHaveClass(/pasek--widoczny/);
 });
