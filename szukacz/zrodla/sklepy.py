@@ -21,12 +21,14 @@ class Sklep:
     max_produktow: int = 8
     uwagi: str = ""
     dostawa_szacunkowa: float | None = None
+    szuka_po_frazie: bool = False
 
 
 def sklepy_profilu(profil):
     wynik = []
     for s in profil.sklepy:
         sklep = Sklep(**s)
+        sklep.szuka_po_frazie = "{fraza" in sklep.lista
         sklep.lista = profil.podstaw(sklep.lista)
         if sklep.dostawa_szacunkowa is None and sklep.wysylka.startswith("tak"):
             sklep.dostawa_szacunkowa = U.WYSYLKA_SKLEPU_W_POLSCE
@@ -60,7 +62,7 @@ def linki_produktow(html, baza, sklep, marka, rozmiar):
 
 def _zadanie(sklep):
     def szukaj(k, oferty):
-        marka = k.profil.marka
+        marka = None if sklep.szuka_po_frazie else k.profil.marka
         odp = k.http.get(sklep.lista)
         if odp.status != 200:
             k.log(sklep.nazwa, f"lista produktów: HTTP {odp.status}")

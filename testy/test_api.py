@@ -35,7 +35,7 @@ class ApiTest(unittest.TestCase):
         self.assertEqual(dane["rozmiary"][0], "38")
         self.assertEqual(dane["rozmiary"][-1], "46")
         marki = {m["id"]: m for m in dane["marki"]}
-        self.assertEqual(set(marki), {"adidas", "joma", "mizuno", "munich", "nike"})
+        self.assertEqual(set(marki), {"adidas", "joma", "mizuno", "munich", "nike", "ortuseight"})
         self.assertIn("continental", [m["id"] for m in marki["munich"]["modele"]])
 
     def test_katalog_podaje_plik_3d_tylko_gdy_istnieje(self):

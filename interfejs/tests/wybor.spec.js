@@ -48,11 +48,11 @@ test("strona startowa pokazuje dane z katalogu i CTA", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveTitle(/Szatnia/);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Halówki w Twoim rozmiarze, od najtańszej oferty");
-  await expect(page.locator("#liczba-marek")).toHaveText("5");
-  await expect(page.locator("#liczba-modeli")).toHaveText("23");
+  await expect(page.locator("#liczba-marek")).toHaveText("6");
+  await expect(page.locator("#liczba-modeli")).toHaveText("24");
   await expect(page.locator("#zakres-rozmiarow")).toHaveText("38–46");
   await expect(page.getByRole("link", { name: "Wybierz but" })).toBeVisible();
-  await expect(page.getByRole("radio")).toHaveCount(5);
+  await expect(page.getByRole("radio")).toHaveCount(6);
 });
 
 test("pusty stan modelu prowadzi do wyboru marki", async ({ page }) => {

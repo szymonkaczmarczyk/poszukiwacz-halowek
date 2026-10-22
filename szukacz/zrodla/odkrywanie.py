@@ -76,7 +76,7 @@ def _z_adresem(url, tytul):
 def kandydat(url, tytul, profil, rozmiar):
     return (
         not pomijana(url, profil)
-        and to_szukany_model(_z_adresem(url, tytul), profil.marka)
+        and to_szukany_model(_z_adresem(url, tytul))
         and ocen_tytul(tytul, rozmiar) != "nie"
     )
 
@@ -144,7 +144,7 @@ def szukaj(k, oferty):
             continue
         nazwa = p.nazwa
         z_adresem = _z_adresem(wpis["url"], nazwa)
-        if not to_szukany_model(z_adresem, k.profil.marka) or p.rozmiar == "nie" or ocen_tytul(nazwa, k.rozmiar) == "nie":
+        if not to_szukany_model(z_adresem) or p.rozmiar == "nie" or ocen_tytul(nazwa, k.rozmiar) == "nie":
             continue
         polski = host(wpis["url"]).endswith(".pl")
         oferty.append(Oferta(

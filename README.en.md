@@ -14,6 +14,7 @@ holds indoor football shoes (Polish: *halówki*) from six brands:
 * Nike: Tiempo Streetgato, Tiempo Reactgato, Phantom (IC versions), Gato, Lunargato II
 * Adidas: Super Sala III, Top Sala II, F50 and Predator (IN versions)
 * Mizuno: Morelia Sala
+* Ortuseight: Jogosala Revolt (a brand from Indonesia, only this one model)
 
 By default the program searches for Munich Continental in size 41.
 
@@ -85,6 +86,13 @@ Nike and Adidas make the same models for different surfaces, so their files have
 patterns like `\bic\b`, `\bin\b`, "halówki", "futsal". An offer with the model name but without such a marker goes to
 review instead of the confirmed list. Models that are indoor by nature (Gato, Top Sala, Super Sala) have
 `oznaczenia_hali = []`.
+
+Ortuseight Jogosala Revolt sells mainly in Indonesia and Malaysia, so there are very few offers shipping to Poland. The
+word "Revolt" plus the brand is enough in the title, and "Jogosala" counts as the brand, because only Ortuseight uses
+that line name. Other Jogosala lines (Rampage, Vanquish, Volta and the rest) are rejected as a different model.
+Recognized product codes: 11020269 (Ivory Camo) and 11020342 (White Ortred). For this model eBay also searches the
+football boots category 19298, and Google discovery uses three phrases instead of six to save SerpAPI queries. Manual
+links lead to the maker's shop, Tokopedia, Shopee and Lazada (Malaysia).
 
 Rules for models other than Munich Continental and Joma Top Flex are simple for now: name, surface exclusions and a
 list of the brand's other models. Product codes are worth adding only after checking them against real offers.
@@ -284,7 +292,7 @@ narzedzia/modele3d/.venv/bin/python narzedzia/modele3d/generuj.py
 A single model: `generuj.py nike/gato`. Regenerating an existing one: `--od-nowa`. List of missing ones: `--brakujace`.
 
 On the author's computer a daily macOS job `pl.szatnia.modele3d` runs
-(`~/Library/LaunchAgents/pl.szatnia.modele3d.plist`). Every day at 2:00 (or after the computer wakes up) it runs
+(`~/Library/LaunchAgents/pl.szatnia.modele3d.plist`). Four times a day, at 3:00, 9:00, 15:00 and 21:00 (or after the computer wakes up), it runs
 `narzedzia/modele3d/codziennie.sh`, which generates missing models until the daily limit runs out. After the last model
 is done, the job removes itself. The run is logged in `narzedzia/modele3d/generuj.log`. To turn it off earlier:
 

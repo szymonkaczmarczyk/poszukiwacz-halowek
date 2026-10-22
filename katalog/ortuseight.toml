@@ -1,0 +1,64 @@
+marka = "Ortuseight"
+aliasy_marki = ["jogosala"]
+opis_wykluczen = "bez korków i turfów"
+wykluczenia = ['\bfg\b', '\bag\b', '\bsg\b', '\btf\b', 'turf']
+inne_modele = [
+    "vanquish", "rampage", "chevron", "victus", "avalanche", "courage", "crusher", "conquer", "ascend",
+    "strive", "purist", "volta", "radiant", "lineage", "arctic", "vicious", "catalyst", "forte",
+]
+
+[[model]]
+id = "jogosala-revolt"
+model = "Revolt"
+nazwa = "Ortuseight Jogosala Revolt"
+opis_wykluczen = "tylko Revolt, bez innych linii Jogosala, korków i turfów"
+frazy = ["ortuseight jogosala revolt", "ortuseight revolt", "jogosala revolt"]
+kody_modelu = ['(?<!\d)110(?:20269|20342)(?!\d)']
+wskazowka_zdjec = "Revolt: skórzana cholewka, kolory Ivory Camo, Black Camo i White Ortred"
+
+[model.ebay]
+zapytanie = "ortuseight revolt"
+kategorie = ["15709", "109133", "19298"]
+
+[model.odkrywanie]
+frazy = [
+    ["ortuseight jogosala revolt", "pl", "pl"],
+    ["ortuseight jogosala revolt", "de", "de"],
+    ["ortuseight jogosala revolt", "uk", "en"],
+]
+
+[[model.reczny]]
+nazwa = "Ortuseight (oficjalny)"
+url = "https://ortuseight.com/pl/futsal/shoes/jogosala"
+opis = "sklep producenta przyjmuje zamówienia zagraniczne (ceny w USD), ale Revolt zniknął już z oferty, sprawdź, czy nie wrócił"
+
+[[model.reczny]]
+nazwa = "Tokopedia"
+url = "https://www.tokopedia.com/search?st=product&q={fraza_url}"
+opis = "największy wybór (Indonezja), sprzedawcy wysyłają tylko w kraju, do Polski przez pośrednika przesyłek"
+
+[[model.reczny]]
+nazwa = "Shopee Malezja"
+url = "https://shopee.com.my/search?keyword={fraza_url}"
+opis = "część sprzedawców wysyła za granicę, koszt i czas dostawy sprawdź przed zakupem"
+
+[[model.reczny]]
+nazwa = "Lazada Malezja"
+url = "https://www.lazada.com.my/catalog/?q={fraza_url}"
+opis = "wysyłkę za granicę sprawdź w ofercie"
+
+[[model.reczny]]
+nazwa = "eBay"
+url = "https://www.ebay.com/sch/i.html?_nkw=ortuseight+revolt&LH_PrefLoc=2"
+opis = "dodaj klucz eBay API do .env, a eBay będzie przeszukiwany automatycznie"
+bez_klucza = "ebay"
+
+[[model.reczny]]
+nazwa = "Allegro"
+url = "https://allegro.pl/listing?string={fraza_url}&order=p"
+opis = "chronione przez DataDome, otwórz ręcznie (posortowane od najtańszych)"
+
+[[model.reczny]]
+nazwa = "Google"
+url = "https://www.google.com/search?q={fraza_url}"
+opis = "szeroki przegląd, także sklepów i ogłoszeń z Azji"

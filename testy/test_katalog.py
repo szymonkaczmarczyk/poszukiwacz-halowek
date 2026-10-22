@@ -100,6 +100,19 @@ class KatalogTest(unittest.TestCase):
         self.assertEqual(ocena("mizuno", "morelia-sala", "Mizuno Morelia Sala Elite IN"), "model")
         self.assertEqual(ocena("mizuno", "morelia-sala", "Mizuno Morelia Sala Classic TF"), "wykluczony")
 
+    def test_ortuseight_tylko_jogosala_revolt(self):
+        self.assertEqual(katalog.profil("ortuseight", "revolt").nazwa, "Ortuseight Jogosala Revolt")
+        self.assertEqual(ocena("ortuseight", "jogosala-revolt", "Ortuseight Jogosala Revolt Ivory Camo 42"), "model")
+        self.assertEqual(ocena("ortuseight", "jogosala-revolt", "Sepatu futsal Ortuseight 11020342"), "model")
+        self.assertEqual(ocena("ortuseight", "jogosala-revolt", "Ortuseight Jogosala Rampage V3 Navy Camo"), "inny")
+        self.assertEqual(ocena("ortuseight", "jogosala-revolt", "Ortuseight Jogosala Volta V3"), "inny")
+        self.assertEqual(ocena("ortuseight", "jogosala-revolt", "Ortuseight Catalyst Legion V5 FG"), "wykluczony")
+        self.assertEqual(ocena("ortuseight", "jogosala-revolt", "Ortuseight Volt V3 IN"), "?")
+        P.ustaw(katalog.profil("ortuseight", "jogosala-revolt", "42"))
+        self.assertTrue(to_szukany_model("Jogosala Revolt IN White Ortred"))
+        self.assertFalse(to_szukany_model("Mills Revolt Phantom Olive Khaki"))
+        self.assertFalse(to_szukany_model("Ortuseight Jogosala Revolt Jr"))
+
 
 if __name__ == "__main__":
     unittest.main()

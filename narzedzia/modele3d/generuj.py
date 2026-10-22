@@ -7,6 +7,7 @@ import tempfile
 import time
 from pathlib import Path
 
+import httpx
 import numpy as np
 import trimesh
 from gradio_client import Client, handle_file
@@ -18,6 +19,9 @@ MODELE = PROJEKT / "interfejs" / "public" / "modele"
 WYBOR = Path(__file__).with_name("wybor_zdjec.json")
 SPACE = "trellis-community/TRELLIS"
 ROZSZERZENIA = {".jpg", ".jpeg", ".png", ".webp"}
+PROBY_SIECI = 3
+PRZERWA_PO_BLEDZIE = 60
+LIMIT_CZASU = httpx.Timeout(900, connect=60)
 
 WARSTWA_DOLNA = 0.085
 WARSTWA_GORNYCH = 0.14
@@ -65,10 +69,37 @@ def usun_tlo_pod_butem(siatka):
     return int(usun.sum())
 
 
+class BrakTekstury(Exception):
+    pass
+
+
+def liczba_obrazow(plik):
+    dane = Path(plik).read_bytes()
+    dlugosc = int.from_bytes(dane[12:16], "little")
+    return len(json.loads(dane[20:20 + dlugosc]).get("images", []))
+
+
+def pobierz_glb(plik, cel, token):
+    if isinstance(plik, (str, Path)) and Path(str(plik)).exists():
+        shutil.copy(plik, cel)
+        return
+    adres = plik.get("url") if isinstance(plik, dict) else str(plik)
+    naglowki = {"Authorization": f"Bearer {token}"} if token else {}
+    with httpx.stream("GET", adres, headers=naglowki, timeout=LIMIT_CZASU, follow_redirects=True) as odpowiedz:
+        odpowiedz.raise_for_status()
+        with open(cel, "wb") as plik_wyjsciowy:
+            for kawalek in odpowiedz.iter_bytes():
+                plik_wyjsciowy.write(kawalek)
+
+
+def blad_sieci(e):
+    return isinstance(e, (httpx.TransportError, TimeoutError, ConnectionError)) or type(e).__name__ in {"CancelledError", "RemoteProtocolError"}
+
+
 def generuj(klucz, indeksy, token, robocze):
     zdjecia = sorted(p for p in (ZDJECIA / klucz).iterdir() if p.suffix.lower() in ROZSZERZENIA)
     wybrane = [zdjecia[i] for i in indeksy]
-    klient = Client(SPACE, verbose=False, token=token)
+    klient = Client(SPACE, verbose=False, token=token, download_files=False, httpx_kwargs={"timeout": LIMIT_CZASU})
     klient.predict(api_name="/start_session")
     wynik = klient.predict(
         image=handle_file(str(wybrane[0])),
@@ -84,17 +115,22 @@ def generuj(klucz, indeksy, token, robocze):
         api_name="/generate_and_extract_glb",
     )
     surowy = robocze / "surowy.glb"
-    shutil.copy(wynik[2] or wynik[1], surowy)
+    pobierz_glb(wynik[2] or wynik[1], surowy, token)
     scena = trimesh.load(surowy, force="scene")
     usuniete = sum(usun_tlo_pod_butem(g) for g in scena.geometry.values())
     czysty = robocze / "czysty.glb"
     scena.export(czysty)
+    if liczba_obrazow(surowy) and not liczba_obrazow(czysty):
+        raise BrakTekstury("tekstura zginęła przy usuwaniu tła, sprawdź, czy w środowisku jest Pillow")
     cel = MODELE / f"{klucz.replace('/', '-')}.glb"
     subprocess.run(
         ["npx", "--yes", "@gltf-transform/cli@4", "optimize", str(czysty), str(cel), "--compress", "meshopt", "--texture-compress", "webp", "--texture-size", "1024"],
         check=True,
         capture_output=True,
     )
+    if liczba_obrazow(czysty) and not liczba_obrazow(cel):
+        cel.unlink()
+        raise BrakTekstury("tekstura zginęła przy kompresji")
     return cel, usuniete
 
 
@@ -118,16 +154,21 @@ def main():
         cel = MODELE / f"{klucz.replace('/', '-')}.glb"
         if cel.exists() and not a.od_nowa:
             continue
-        start = time.time()
-        try:
-            with tempfile.TemporaryDirectory() as robocze:
-                cel, usuniete = generuj(klucz, indeksy, token, Path(robocze))
-            print(f"{klucz}: gotowe w {time.time() - start:.0f} s, {cel.stat().st_size // 1024} KB, usunięto {usuniete} trójkątów tła", flush=True)
-        except Exception as e:
-            print(f"{klucz}: błąd {type(e).__name__}: {str(e)[:200]}", flush=True)
-            if "quota" in str(e).lower():
-                print("Limit GPU na dziś wyczerpany. Uruchom ponownie jutro, gotowe modele zostaną pominięte.")
-                return 3
+        for proba in range(1, PROBY_SIECI + 1):
+            start = time.time()
+            try:
+                with tempfile.TemporaryDirectory() as robocze:
+                    cel, usuniete = generuj(klucz, indeksy, token, Path(robocze))
+                print(f"{klucz}: gotowe w {time.time() - start:.0f} s, {cel.stat().st_size // 1024} KB, usunięto {usuniete} trójkątów tła", flush=True)
+                break
+            except Exception as e:
+                print(f"{klucz}: błąd {type(e).__name__} (próba {proba} z {PROBY_SIECI}): {str(e)[:200]}", flush=True)
+                if "quota" in str(e).lower():
+                    print("Limit GPU na dziś wyczerpany. Uruchom ponownie jutro, gotowe modele zostaną pominięte.")
+                    return 3
+                if not blad_sieci(e) or proba == PROBY_SIECI:
+                    break
+                time.sleep(PRZERWA_PO_BLEDZIE * proba)
     return 0
 
 

@@ -11,6 +11,7 @@ Co szukać, wybierasz z **katalogu modeli** (`katalog/`): marka, model i rozmiar
 * Nike: Tiempo Streetgato, Tiempo Reactgato, Phantom (wersje IC), Gato, Lunargato II
 * Adidas: Super Sala III, Top Sala II, F50 i Predator (wersje IN)
 * Mizuno: Morelia Sala
+* Ortuseight: Jogosala Revolt (marka z Indonezji, tylko ten jeden model)
 
 Domyślnie program szuka Munich Continental w rozmiarze 41.
 
@@ -70,6 +71,8 @@ Profil wyszukiwania składa się z trzech poziomów, od ogólnego do szczegóło
 Plik marki ma pola profilu (bez `model`) i listę modeli `[[model]]`. Każdy model ma `id` (używane w `--model` i w nazwie katalogu z danymi), `model` (słowa, które muszą być w tytule) i opcjonalnie `nazwa` oraz dowolne pola profilu. Sekcje modelu zapisuje się jako `[model.olx]`, `[[model.sklep]]` itd. Bez `frazy` program użyje „marka model” i „halowki marka model”.
 
 Nike i Adidas robią te same modele na różne nawierzchnie, dlatego ich pliki mają `oznaczenia_hali`: wzorce typu `\bic\b`, `\bin\b`, „halówki”, „futsal”. Oferta z nazwą modelu, ale bez takiego oznaczenia trafia do sprawdzenia zamiast na listę pewnych. Modele halowe z natury (Gato, Top Sala, Super Sala) mają `oznaczenia_hali = []`.
+
+Ortuseight Jogosala Revolt sprzedaje się głównie w Indonezji i Malezji, więc ofert z wysyłką do Polski jest bardzo mało. W tytule wystarczy słowo „Revolt” i marka, a „Jogosala” liczy się jako marka, bo tej nazwy linii używa tylko Ortuseight. Inne linie Jogosala (Rampage, Vanquish, Volta i reszta) są odrzucane jako inny model. Rozpoznawane kody produktu: 11020269 (Ivory Camo) i 11020342 (White Ortred). eBay przeszukuje dla tego modelu także kategorię butów piłkarskich 19298, a odkrywanie w Google używa trzech fraz zamiast sześciu, żeby oszczędzać zapytania SerpAPI. Linki ręczne prowadzą do sklepu producenta, Tokopedii, Shopee i Lazady (Malezja).
 
 Reguły dla modeli spoza Munich Continental i Joma Top Flex są na razie proste: nazwa, wykluczenia nawierzchni i lista innych modeli marki. Kody produktów warto dopisywać dopiero po sprawdzeniu ich na prawdziwych ofertach.
 
@@ -222,7 +225,7 @@ narzedzia/modele3d/.venv/bin/python narzedzia/modele3d/generuj.py
 
 Pojedynczy model: `generuj.py nike/gato`. Ponowne wygenerowanie istniejącego: `--od-nowa`. Lista brakujących: `--brakujace`.
 
-Na tym komputerze działa codzienne zadanie macOS `pl.szatnia.modele3d` (`~/Library/LaunchAgents/pl.szatnia.modele3d.plist`). Codziennie o 2:00 (albo po wybudzeniu komputera) uruchamia `narzedzia/modele3d/codziennie.sh`, a ten generuje brakujące modele, aż skończy się dzienny limit. Po zrobieniu ostatniego modelu zadanie samo się usuwa. Przebieg zapisuje się w `narzedzia/modele3d/generuj.log`. Żeby wyłączyć je wcześniej:
+Na tym komputerze działa codzienne zadanie macOS `pl.szatnia.modele3d` (`~/Library/LaunchAgents/pl.szatnia.modele3d.plist`). Cztery razy dziennie, o 3:00, 9:00, 15:00 i 21:00 (albo po wybudzeniu komputera), uruchamia `narzedzia/modele3d/codziennie.sh`, a ten generuje brakujące modele, aż skończy się dzienny limit. Po zrobieniu ostatniego modelu zadanie samo się usuwa. Przebieg zapisuje się w `narzedzia/modele3d/generuj.log`. Żeby wyłączyć je wcześniej:
 
 ```bash
 launchctl bootout gui/$(id -u)/pl.szatnia.modele3d

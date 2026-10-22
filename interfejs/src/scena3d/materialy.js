@@ -9,6 +9,7 @@ export const ZESTAWY = {
   nike: { cholewka: "#18181b", nosek: "#202024", zapietek: "#18181b", pas: "#d9e44a", podeszwa: "#a8743f", sznurowki: "#ecece6", szorstkosc: 0.5, polysk: 0.2 },
   adidas: { cholewka: "#f2f1ec", nosek: "#e8e6df", zapietek: "#141416", pas: "#141416", podeszwa: "#c08a52", sznurowki: "#f6f5f0", szorstkosc: 0.45, polysk: 0.1 },
   mizuno: { cholewka: "#1f4fb8", nosek: "#1a45a3", zapietek: "#f3f3ef", pas: "#f3f3ef", podeszwa: "#ecebe6", sznurowki: "#f3f3ef", szorstkosc: 0.4, polysk: 0.1 },
+  ortuseight: { cholewka: "#ece5d3", nosek: "#e2dac6", zapietek: "#55553f", pas: "#d23a2c", podeszwa: "#b98552", sznurowki: "#f2eee4", szorstkosc: 0.45, polysk: 0.12 },
 };
 
 export function zestaw(marka) {
