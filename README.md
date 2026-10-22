@@ -1,5 +1,7 @@
 # Poszukiwacz obuwia
 
+**Polski** · [English](README.en.md)
+
 Szuka wybranego modelu butów w podanym rozmiarze w sklepach i na marketplace'ach z wysyłką do Polski. Wyniki sortuje od najtańszych, a ceny w euro przelicza po kursie NBP.
 
 Co szukać, wybierasz z **katalogu modeli** (`katalog/`): marka, model i rozmiar od 38 do 46. W katalogu są halówki sześciu marek:
@@ -432,3 +434,9 @@ Jeśli program zgłasza `invalid_client`, klucz Production jest najpewniej nieak
 3. Włącz przełącznik **Exempted from Marketplace Account Deletion**, wybierz powód „I do not persist eBay data” i zatwierdź. Pól na adres powiadomień, e-mail i token nie wypełniaj.
 
 Program nie zapisuje odpowiedzi API eBaya na dysku, więc ta deklaracja jest zgodna z prawdą.
+
+## Licencja
+
+[MIT](LICENSE) © 2026 Szymon Kaczmarczyk
+
+Kod jest na licencji MIT. Korzystając ze sklepów, marketplace'ów i API (eBay, SerpAPI), przestrzegaj ich regulaminów.
