@@ -14,8 +14,9 @@ from fastapi.responses import JSONResponse, Response, StreamingResponse
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl
 
 from . import admin as A
-from . import katalog, przebieg, ukryte, wlasne
+from . import alerty, katalog, powiadomienia, przebieg, ukryte, wlasne
 from . import ustawienia as U
+from .blokada import BlokadaPliku
 
 HOSTY = ["127.0.0.1", "localhost"]
 PORT = 8765
@@ -64,6 +65,16 @@ class NowyModel(BaseModel):
     wykluczenia: list[Annotated[str, Field(min_length=1, max_length=30, pattern=WZOR_SLOWA)]] = Field(default_factory=list, max_length=15)
     opis: str = Field(default="", max_length=120)
     wymagaj_oznaczenia_hali: bool = True
+
+
+class NowyAlert(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    marka: str = Field(min_length=1, max_length=40)
+    model: str = Field(min_length=1, max_length=60)
+    rozmiary: list[str] = Field(min_length=1, max_length=9)
+    max_cena: float | None = Field(default=None, gt=0, le=100000)
+    tylko_pewne: bool = False
 
 
 class Logowanie(BaseModel):
@@ -120,17 +131,24 @@ class Wyszukiwanie:
         }
 
 
+class SprawdzanieAlertow(Exception):
+    pass
+
+
 class Menedzer:
     def __init__(self, wykonaj):
         self.wykonaj = wykonaj
         self.wyszukiwania = OrderedDict()
         self.aktywne = None
         self._blokada = threading.Lock()
+        self._blokada_procesow = BlokadaPliku(U.PLIK_BLOKADY_WYSZUKIWANIA)
 
     def uruchom(self, zapytanie, profil):
         with self._blokada:
             if self.aktywne and not self.aktywne.zakonczone:
                 return None
+            if not self._blokada_procesow.zajmij():
+                raise SprawdzanieAlertow
             w = Wyszukiwanie(zapytanie, profil)
             self.aktywne = w
             self.wyszukiwania[w.id] = w
@@ -167,6 +185,7 @@ class Menedzer:
             if w.przerwanie.is_set():
                 stan = "przerwane"
                 break
+        self._blokada_procesow.zwolnij()
         w.koniec = time.time()
         w.dodaj("wyszukiwanie_koniec", {"stan": stan, "czas": round(w.koniec - w.start, 1), "gotowe_rozmiary": sorted(w.wyniki)})
         w.stan = stan
@@ -187,6 +206,13 @@ def _profil(marka, model):
         return katalog.profil(marka, model)
     except katalog.BladKatalogu as e:
         raise HTTPException(404, str(e)) from e
+
+
+def _ostatnie_oferty(profil, rozmiar):
+    try:
+        return json.loads((profil.katalog_wynikow(rozmiar) / "oferty.json").read_text(encoding="utf-8")).get("oferty", [])
+    except (OSError, ValueError):
+        return []
 
 
 def _model_3d(marka, model):
@@ -229,7 +255,7 @@ def utworz(wykonaj=przebieg.wykonaj, hosty=HOSTY, interfejs=None, administrator=
 
     def wymagaj_admina(request: Request):
         if not administrator.sprawdz(request.cookies.get(A.CIASTKO)):
-            raise HTTPException(401, "tylko administrator może zmieniać modele, zaloguj się na stronie /admin.html")
+            raise HTTPException(401, "tylko administrator ma do tego dostęp, zaloguj się na stronie /admin.html")
     app.state.menedzer = menedzer
 
     @app.middleware("http")
@@ -315,7 +341,10 @@ def utworz(wykonaj=przebieg.wykonaj, hosty=HOSTY, interfejs=None, administrator=
         if zle:
             raise HTTPException(422, f"nieobsługiwane rozmiary: {', '.join(zle)}; dostępne {dozwolone[0]}–{dozwolone[-1]}")
         zapytanie.rozmiary = sorted(set(zapytanie.rozmiary), key=dozwolone.index)
-        w = menedzer.uruchom(zapytanie, _profil(zapytanie.marka, zapytanie.model))
+        try:
+            w = menedzer.uruchom(zapytanie, _profil(zapytanie.marka, zapytanie.model))
+        except SprawdzanieAlertow as e:
+            raise HTTPException(409, "w tle trwa sprawdzanie alertów, spróbuj za kilka minut") from e
         if w is None:
             raise HTTPException(409, "trwa już inne wyszukiwanie, poczekaj na jego koniec")
         return {**w.opis(), "zdarzenia": f"/api/wyszukiwania/{w.id}/zdarzenia"}
@@ -359,6 +388,57 @@ def utworz(wykonaj=przebieg.wykonaj, hosty=HOSTY, interfejs=None, administrator=
             w.przerwanie.set()
             w.dodaj("przerywanie", {})
         return w.opis()
+
+    @app.get("/api/alerty", dependencies=[Depends(wymagaj_admina)])
+    def lista_alertow():
+        return {
+            "alerty": alerty.lista(),
+            "godziny": list(U.GODZINY_ALERTOW),
+            "harmonogram": U.PLIK_HARMONOGRAMU_ALERTOW.is_file(),
+            "kanaly": powiadomienia.kanaly(),
+        }
+
+    @app.post("/api/alerty", status_code=201, dependencies=[Depends(wymagaj_admina)])
+    def dodaj_alert(nowy: NowyAlert):
+        dozwolone = katalog.rozmiary()
+        zle = [r for r in nowy.rozmiary if r not in dozwolone]
+        if zle:
+            raise HTTPException(422, f"nieobsługiwane rozmiary: {', '.join(zle)}")
+        try:
+            marka, model = katalog.znajdz(nowy.marka, nowy.model)
+        except katalog.BladKatalogu as e:
+            raise HTTPException(404, str(e)) from e
+        profil = _profil(marka.id, model.id)
+        wpisy = [
+            {
+                "marka": marka.id,
+                "model": model.id,
+                "nazwa": model.nazwa,
+                "rozmiar": rozmiar,
+                "max_cena": nowy.max_cena,
+                "tylko_pewne": nowy.tylko_pewne,
+                "oferty": _ostatnie_oferty(profil, rozmiar),
+            }
+            for rozmiar in sorted(set(nowy.rozmiary), key=dozwolone.index)
+        ]
+        try:
+            dodane, pominiete = alerty.dodaj(wpisy)
+        except alerty.BladAlertow as e:
+            raise HTTPException(e.kod, str(e)) from e
+        if not dodane:
+            raise HTTPException(409, "taki alert już istnieje")
+        return {"dodane": dodane, "pominiete": pominiete, "godziny": list(U.GODZINY_ALERTOW)}
+
+    @app.post("/api/alerty/przeczytane", dependencies=[Depends(wymagaj_admina)])
+    def przeczytane_alerty():
+        alerty.oznacz_przeczytane()
+        return {"ok": True}
+
+    @app.delete("/api/alerty/{identyfikator}", status_code=204, dependencies=[Depends(wymagaj_admina)])
+    def usun_alert(identyfikator: str):
+        if not alerty.usun(identyfikator):
+            raise HTTPException(404, "nie ma takiego alertu")
+        return Response(status_code=204)
 
     @app.post("/api/ukryte")
     def ukryj(wpis: DoUkrycia):

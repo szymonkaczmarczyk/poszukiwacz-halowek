@@ -3,7 +3,7 @@ import os
 import sys
 import webbrowser
 
-from szukacz import katalog, przebieg, raport, ukryte
+from szukacz import alerty, katalog, powiadomienia, przebieg, raport, ukryte
 from szukacz import profil as P
 from szukacz import ustawienia as U
 
@@ -27,6 +27,8 @@ def argumenty():
     p.add_argument("--ukryj", nargs="+", metavar="LINK", help="ukryj oferty o podanych linkach w kolejnych wynikach i zakończ")
     p.add_argument("--pokaz-ukryte", action="store_true", help="pokaż także oferty z pliku ukryte.txt")
     p.add_argument("--widoczna-przegladarka", action="store_true", help="pokaż okna przeglądarki używanej dla OLX i Goalinn")
+    p.add_argument("--sprawdz-alerty", action="store_true", help="sprawdź zapisane alerty i wyślij powiadomienia o nowych i tańszych ofertach")
+    p.add_argument("--test-powiadomien", action="store_true", help="wyślij próbne powiadomienie na Maca i Telegram, jeśli jest ustawiony")
     p.add_argument("--nie-otwieraj", action="store_true", help="nie otwieraj raportu HTML po zakończeniu")
     p.add_argument("-v", "--gadatliwy", action="store_true", help="więcej szczegółów w trakcie działania")
     return p.parse_args()
@@ -65,6 +67,24 @@ def drukuj_zdarzenie(nazwa_profilu):
     return sluchacz
 
 
+def sprawdz_alerty():
+    if not alerty.wczytaj():
+        print(f"{alerty.teraz()} Brak zapisanych alertów. Zapisz je w Szatni po wyszukiwaniu.")
+        return 0
+    raport = alerty.sprawdz_wszystkie()
+    return 0 if all(r["stan"] == "ok" for r in raport) else 1
+
+
+def test_powiadomien():
+    wyniki = powiadomienia.wyslij("Szatnia: próbne powiadomienie", "Tak będą wyglądać alerty o nowych i tańszych ofertach.", "Tak będą wyglądać alerty o nowych i tańszych ofertach.")
+    if not wyniki:
+        print("Brak kanałów powiadomień. Na Macu działają same, Telegram wymaga TELEGRAM_BOT_TOKEN i TELEGRAM_CHAT_ID w .env.")
+        return 1
+    for kanal, stan in wyniki.items():
+        print(f"{kanal}: {stan}")
+    return 0 if all(stan == "wysłano" for stan in wyniki.values()) else 1
+
+
 def rozmiary(a, profil):
     return [r.strip() for r in str(a.rozmiar or profil.rozmiar).split(",") if r.strip()]
 
@@ -83,6 +103,10 @@ def main():
         dodane = ukryte.dodaj(U.PLIK_UKRYTYCH, a.ukryj)
         print(f"Ukryto {len(dodane)} ofert (plik {U.PLIK_UKRYTYCH.name})." if dodane else "Te oferty były już ukryte.")
         return 0
+    if a.sprawdz_alerty:
+        return sprawdz_alerty()
+    if a.test_powiadomien:
+        return test_powiadomien()
     if a.lista_modeli:
         lista_modeli()
         return 0

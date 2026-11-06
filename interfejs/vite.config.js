@@ -16,6 +16,7 @@ export default defineConfig({
         polityka: "polityka-prywatnosci.html",
         regulamin: "regulamin.html",
         admin: "admin.html",
+        alerty: "alerty.html",
       },
     },
   },

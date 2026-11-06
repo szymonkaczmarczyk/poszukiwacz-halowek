@@ -1,6 +1,7 @@
 import * as api from "./api.js";
 import { el, odmiana, wyczysc, zl } from "./dom.js";
 import { ikona } from "./ikony.js";
+import { opisGodzin } from "./alerty-wspolne.js";
 import { powiadom } from "./powiadomienia.js";
 import { pojawienie, przewin } from "./ruch.js";
 import { widokWynikow } from "./wyniki.js";
@@ -25,8 +26,9 @@ function ogloszZdarzenie(zdarzenie) {
   document.dispatchEvent(new CustomEvent("szatnia:wyszukiwanie", { detail: zdarzenie }));
 }
 
-export function postep({ sekcja, tytul, numer, opis, zrodla, wyniki, przerwij, pasekPostepu }, { naKoniec }) {
+export function postep({ sekcja, tytul, numer, opis, zrodla, wyniki, przerwij, pasekPostepu, zapiszAlert }, { naKoniec, czyAdmin, naZapisanyAlert }) {
   let pozycje = new Map();
+  let szukane = null;
   let zakonczone = true;
   let identyfikator = null;
   let rozmiaryRazem = 1;
@@ -54,6 +56,37 @@ export function postep({ sekcja, tytul, numer, opis, zrodla, wyniki, przerwij, p
     } catch (blad) {
       cofnijWidok();
       powiadom(`Nie udało się ukryć oferty: ${blad.message}. Spróbuj jeszcze raz.`, { rodzaj: "blad" });
+    }
+  }
+
+  function ustawPrzyciskAlertu(zapisany) {
+    wyczysc(zapiszAlert, ikona(zapisany ? "Check" : "BellRing"), zapisany ? "Alert zapisany" : "Powiadamiaj o nowych i tańszych");
+    if (zapisany) zapiszAlert.setAttribute("aria-disabled", "true");
+    else zapiszAlert.removeAttribute("aria-disabled");
+  }
+
+  const pokazAlerty = { etykieta: "Pokaż alerty", wykonaj: () => location.assign("/alerty.html") };
+
+  async function zapiszJakoAlert() {
+    if (!szukane || zapiszAlert.getAttribute("aria-disabled") === "true") return;
+    zapiszAlert.setAttribute("aria-disabled", "true");
+    const dane = { marka: szukane.marka, model: szukane.model, rozmiary: szukane.rozmiary, tylko_pewne: szukane.tylkoPewne };
+    if (typeof szukane.maxCena === "number") dane.max_cena = szukane.maxCena;
+    try {
+      const wynik = await api.dodajAlert(dane);
+      ustawPrzyciskAlertu(true);
+      const rozmiary = wynik.dodane.map((a) => a.rozmiar);
+      powiadom(`Alert zapisany dla ${odmiana(rozmiary.length, "rozmiaru", "rozmiarów", "rozmiarów")} ${rozmiary.join(", ")}. Sprawdzam codziennie o ${opisGodzin(wynik.godziny)} i dam znać o nowych i tańszych ofertach.`, { akcja: pokazAlerty });
+      naZapisanyAlert();
+    } catch (blad) {
+      if (blad.status === 409 && blad.message.startsWith("taki alert")) {
+        ustawPrzyciskAlertu(true);
+        powiadom("Taki alert już masz. Nowe i tańsze oferty pokażę na stronie alertów.", { akcja: pokazAlerty });
+        return;
+      }
+      zapiszAlert.removeAttribute("aria-disabled");
+      const tekst = blad.status === 401 ? "Sesja administratora wygasła. Zaloguj się ponownie i zapisz alert jeszcze raz." : `Nie udało się zapisać alertu: ${blad.message}.`;
+      powiadom(tekst, { rodzaj: "blad", akcja: blad.status === 409 ? pokazAlerty : null });
     }
   }
 
@@ -138,6 +171,7 @@ export function postep({ sekcja, tytul, numer, opis, zrodla, wyniki, przerwij, p
       numer.textContent = "Przerwane";
       tytul.textContent = "Wyszukiwanie przerwane";
     }
+    zapiszAlert.hidden = !(szukane && czyAdmin() && dane.stan !== "blad");
     naKoniec(dane.stan);
   }
 
@@ -155,6 +189,7 @@ export function postep({ sekcja, tytul, numer, opis, zrodla, wyniki, przerwij, p
   }
 
   przerwij.addEventListener("click", zadajPrzerwanie);
+  zapiszAlert.addEventListener("click", zapiszJakoAlert);
   document.addEventListener("keydown", (zdarzenie) => {
     if (zdarzenie.key === "Escape" && !zakonczone) zadajPrzerwanie();
   });
@@ -169,6 +204,9 @@ export function postep({ sekcja, tytul, numer, opis, zrodla, wyniki, przerwij, p
     async uruchom(stan) {
       zakonczone = false;
       identyfikator = null;
+      szukane = { ...stan, rozmiary: [...stan.rozmiary] };
+      zapiszAlert.hidden = true;
+      ustawPrzyciskAlertu(false);
       gotoweRozmiary = 0;
       rozmiaryRazem = stan.rozmiary.length;
       pozycje = new Map();

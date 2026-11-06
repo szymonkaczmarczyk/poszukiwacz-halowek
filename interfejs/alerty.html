@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0e0e10">
+<title>Alerty o ofertach - Szatnia</title>
+<meta name="description" content="Zapisane wyszukiwania halówek. Szatnia sprawdza je kilka razy dziennie i powiadamia o nowych i tańszych ofertach w Twoim rozmiarze.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="robots" content="noindex, nofollow">
+<script type="module" src="/src/alerty.js"></script>
+</head>
+<body class="strona">
+<header class="naglowek">
+  <a class="naglowek__wroc" href="/"><span data-ikona="ArrowLeft"></span>Wróć do Szatni</a>
+</header>
+<main class="alerty-strona">
+  <h1 tabindex="-1">Alerty o ofertach</h1>
+  <p class="alerty-strona__opis">Szatnia sama sprawdza zapisane wyszukiwania i daje znać, gdy pojawi się nowa oferta albo któraś stanieje.</p>
+  <section class="alerty-ustawienia" id="alerty-ustawienia" aria-label="Harmonogram i powiadomienia" hidden></section>
+  <div class="alerty-lista" id="alerty-lista" aria-busy="true"></div>
+</main>
+<div class="powiadomienia" id="powiadomienia" aria-live="polite"></div>
+</body>
+</html>

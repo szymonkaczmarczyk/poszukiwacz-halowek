@@ -7,6 +7,7 @@ import "./style/strony.css";
 
 import * as api from "./api.js";
 import { el, wyczysc } from "./dom.js";
+import { dzwonekAlertow } from "./alerty-wspolne.js";
 import { edytorModelu } from "./edytor.js";
 import { ikona, wstawIkony } from "./ikony.js";
 import { krokFiltry } from "./kroki/filtry.js";
@@ -149,10 +150,15 @@ async function uruchom() {
       else if (usuniety && stan.marka === usuniety.marka && stan.model === usuniety.model) zmien({ model: null });
     },
   });
+  let admin = false;
+  const dzwonek = dzwonekAlertow();
   api
     .stanAdmina()
     .then(({ zalogowany }) => {
       if (!zalogowany) return;
+      admin = true;
+      $("status-api").after(dzwonek.element);
+      dzwonek.odswiez();
       $("lista-modeli").after(
         el("button", { type: "button", class: "przycisk przycisk--maly krok__wlasny", onClick: () => edytor.otworz() }, ikona("Plus"), "Dodaj własny model"),
       );
@@ -174,8 +180,10 @@ async function uruchom() {
     },
   );
   const wyszukiwanie = postep(
-    { sekcja: $("postep"), tytul: $("postep-tytul"), numer: $("postep-nr"), opis: $("postep-opis"), zrodla: $("zrodla-postep"), wyniki: $("wyniki"), przerwij: $("przerwij"), pasekPostepu: $("pasek-postepu") },
+    { sekcja: $("postep"), tytul: $("postep-tytul"), numer: $("postep-nr"), opis: $("postep-opis"), zrodla: $("zrodla-postep"), wyniki: $("wyniki"), przerwij: $("przerwij"), pasekPostepu: $("pasek-postepu"), zapiszAlert: $("zapisz-alert") },
     {
+      czyAdmin: () => admin,
+      naZapisanyAlert: () => dzwonek.odswiez(),
       naKoniec: (stan) => {
         sterowanie.ustawTrwa(false);
         ustawStatus(stan === "blad" ? "blad" : "ok", stan === "blad" ? "Wyszukiwanie przerwane" : "Serwer działa");

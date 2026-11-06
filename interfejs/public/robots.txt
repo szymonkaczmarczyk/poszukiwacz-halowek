@@ -1,6 +1,7 @@
 User-agent: *
 Disallow: /api/
 Disallow: /admin.html
+Disallow: /alerty.html
 Allow: /
 
 Sitemap: https://[[domena]]/sitemap.xml

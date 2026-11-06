@@ -81,6 +81,22 @@ export async function usunWlasny(marka, model) {
   }
 }
 
+export function alerty() {
+  return zapytanie("/api/alerty");
+}
+
+export function dodajAlert(dane) {
+  return zapytanie("/api/alerty", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(dane) });
+}
+
+export function usunAlert(id) {
+  return zapytanie(`/api/alerty/${encodeURIComponent(id)}`, { method: "DELETE" });
+}
+
+export function przeczytaneAlerty() {
+  return zapytanie("/api/alerty/przeczytane", { method: "POST" });
+}
+
 export const TYPY_ZDARZEN = ["wyszukiwanie_start", "start", "zrodlo_start", "log", "zrodlo_koniec", "koniec", "blad", "przerywanie", "wyszukiwanie_koniec"];
 
 export function sluchajZdarzen(adres, obsluz, przyBledzie) {

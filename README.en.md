@@ -304,6 +304,42 @@ launchctl bootout gui/$(id -u)/pl.szatnia.modele3d
 rm ~/Library/LaunchAgents/pl.szatnia.modele3d.plist
 ```
 
+## Alerts about new and cheaper offers
+
+Szatnia checks saved searches on its own every day at 9:00, 15:00 and 21:00 (the hours are `GODZINY_ALERTOW` in `szukacz/ustawienia.py`). When a new offer appears, or an offer drops below the lowest price seen so far, it sends a notification. Only offers with a recognized model count. Listings in the "model to check on the photo" group show up in regular results but do not trigger alerts.
+
+1. Log in as the administrator (`/admin.html`). Set the password with `py serwer.py --ustaw-haslo`.
+2. Search as usual. When results appear, click "Powiadamiaj o nowych i tańszych" (notify me about new and cheaper offers). The alert stores the model, size, price limit and the "confirmed only" option. Offers from that search count as already seen, so you only hear about changes.
+3. The "Alerty" bell in the header opens `/alerty.html` with every alert, recent changes with offer links, the last check status and a delete button. A green dot marks changes since your last visit.
+
+The macOS job `pl.szatnia.alerty` runs the checks automatically:
+
+```bash
+narzedzia/alerty/harmonogram.sh
+```
+
+Turn it off with `narzedzia/alerty/harmonogram.sh --wylacz`. Runs are logged to `dane/alerty.log`. If the Mac is asleep on the hour, the check runs after it wakes up. To check manually: `py szukaj.py --sprawdz-alerty`.
+
+Every check fetches pages fresh, bypassing the cache, and saves the usual report in `wyniki/`. A check waits for a search running in the browser, and the browser asks you to wait while alerts are being checked. If no source answers, the alert forgets nothing and tries again next time.
+
+Notifications:
+
+- **Mac**: a system notification with a sound, works out of the box. The first time, macOS may ask to allow notifications for "Script Editor".
+- **Telegram** (on your phone, with offer links): message @BotFather, send `/newbot` and copy the token. Send anything to your new bot, open `https://api.telegram.org/bot<TOKEN>/getUpdates` and read the number in `"chat":{"id":...}`. Put both values in `.env`:
+
+```
+TELEGRAM_BOT_TOKEN=...
+TELEGRAM_CHAT_ID=...
+```
+
+Send a test notification to every configured channel:
+
+```bash
+py szukaj.py --test-powiadomien
+```
+
+Alerts and remembered prices live in `dane/alerty.json` (outside the repository). Up to 20 alerts.
+
 ## API server (for the browser interface)
 
 ```bash
@@ -331,6 +367,10 @@ out, is at `/api/dokumentacja`.
 | `GET /api/wlasne` | list of custom models |
 | `POST /api/wlasne` | adds a custom model (administrator only), body `{"marka", "model", "wykluczenia", "opis", "wymagaj_oznaczenia_hali"}` |
 | `DELETE /api/wlasne/{marka}/{model}` | removes a custom model (administrator only) |
+| `GET /api/alerty` | alerts, check hours, whether the schedule and notification channels are on (administrator only) |
+| `POST /api/alerty` | saves an alert for each size, body `{"marka", "model", "rozmiary", "max_cena", "tylko_pewne"}` (administrator only) |
+| `POST /api/alerty/przeczytane` | marks changes as read (administrator only) |
+| `DELETE /api/alerty/{id}` | deletes an alert (administrator only) |
 
 Example of starting a search for two sizes in two sources:
 

@@ -1,4 +1,4 @@
-import { el, odmiana, wyczysc, zl } from "./dom.js";
+import { bezpiecznyAdres, el, odmiana, wyczysc, zl } from "./dom.js";
 import { ikona } from "./ikony.js";
 import { pojawienie, przewin } from "./ruch.js";
 
@@ -14,15 +14,6 @@ const SORTOWANIE = {
   zrodlo: (a, b) => a.zrodlo.localeCompare(b.zrodlo, "pl") || a.suma_pln - b.suma_pln,
 };
 const ZNAKI_WALUT = { EUR: "€", GBP: "£", USD: "$" };
-
-export function bezpiecznyAdres(adres) {
-  try {
-    const url = new URL(adres);
-    return url.protocol === "https:" || url.protocol === "http:" ? url.href : null;
-  } catch {
-    return null;
-  }
-}
 
 function znaczekFlagi(flaga) {
   if (flaga === "NOWE") return el("li", { class: "znaczek znaczek--sukces" }, ikona("Sparkles"), "nowa");

@@ -235,6 +235,42 @@ launchctl bootout gui/$(id -u)/pl.szatnia.modele3d
 rm ~/Library/LaunchAgents/pl.szatnia.modele3d.plist
 ```
 
+## Alerty o nowych i tańszych ofertach
+
+Zapisane wyszukiwanie Szatnia sprawdza sama, codziennie o 9:00, 15:00 i 21:00 (godziny są w `szukacz/ustawienia.py`, `GODZINY_ALERTOW`). Jeśli pojawi się nowa oferta albo któraś stanieje poniżej najniższej widzianej ceny, wysyła powiadomienie. Liczą się tylko oferty z rozpoznanym modelem. Ogłoszenia z grupy „Model do sprawdzenia na zdjęciu” widać w zwykłych wynikach, ale nie budzą alertu.
+
+1. Zaloguj się jako administrator (`/admin.html`). Hasło ustawisz poleceniem `py serwer.py --ustaw-haslo`.
+2. Wyszukaj buty jak zwykle. Gdy pojawią się wyniki, kliknij „Powiadamiaj o nowych i tańszych”. Alert zapamiętuje model, rozmiar, limit ceny i opcję „tylko pewne”. Oferty z tego wyszukiwania uznaje za już widziane, więc powiadomi tylko o zmianach.
+3. Dzwonek „Alerty” w nagłówku prowadzi do strony `/alerty.html`. Są tam wszystkie alerty, ostatnie zmiany z linkami do ofert, stan ostatniego sprawdzenia i przycisk usuwania. Zielona kropka oznacza zmiany od ostatniej wizyty.
+
+Automatyczne sprawdzanie włącza zadanie macOS `pl.szatnia.alerty`:
+
+```bash
+narzedzia/alerty/harmonogram.sh
+```
+
+Wyłączenie: `narzedzia/alerty/harmonogram.sh --wylacz`. Przebieg zapisuje się w `dane/alerty.log`. Jeśli Mac śpi o pełnej godzinie, sprawdzenie odbędzie się po wybudzeniu. Ręcznie: `py szukaj.py --sprawdz-alerty`.
+
+Każde sprawdzenie pobiera strony od nowa, z pominięciem pamięci podręcznej, i zapisuje zwykły raport w `wyniki/`. Gdy w tym czasie trwa wyszukiwanie w przeglądarce, sprawdzanie na nie czeka. Gdy alerty sprawdzają się w tle, przeglądarka prosi o chwilę cierpliwości. Gdy żadne źródło nie odpowie, alert niczego nie zapomina i spróbuje przy następnym sprawdzeniu.
+
+Powiadomienia:
+
+- **Mac**: powiadomienie systemowe z dźwiękiem, działa od razu. Za pierwszym razem macOS może zapytać o zgodę dla „Edytora skryptów”.
+- **Telegram** (na telefon, z linkami do ofert): w Telegramie napisz do @BotFather, wyślij `/newbot` i skopiuj token. Napisz cokolwiek do swojego nowego bota, otwórz w przeglądarce `https://api.telegram.org/bot<TOKEN>/getUpdates` i odczytaj liczbę z `"chat":{"id":...}`. Wpisz obie wartości do `.env`:
+
+```
+TELEGRAM_BOT_TOKEN=...
+TELEGRAM_CHAT_ID=...
+```
+
+Próbne powiadomienie na wszystkie ustawione kanały:
+
+```bash
+py szukaj.py --test-powiadomien
+```
+
+Alerty i zapamiętane ceny są w `dane/alerty.json` (poza repozytorium). Najwyżej 20 alertów.
+
 ## Serwer API (dla interfejsu w przeglądarce)
 
 ```bash
@@ -261,6 +297,10 @@ Serwer działa tylko lokalnie pod `http://127.0.0.1:8765`. Opis wszystkich adres
 | `GET /api/wlasne` | lista własnych modeli |
 | `POST /api/wlasne` | dodaje własny model (tylko administrator), body `{"marka", "model", "wykluczenia", "opis", "wymagaj_oznaczenia_hali"}` |
 | `DELETE /api/wlasne/{marka}/{model}` | usuwa własny model (tylko administrator) |
+| `GET /api/alerty` | alerty, godziny sprawdzania, czy harmonogram i kanały powiadomień są włączone (tylko administrator) |
+| `POST /api/alerty` | zapisuje alert dla każdego rozmiaru, body `{"marka", "model", "rozmiary", "max_cena", "tylko_pewne"}` (tylko administrator) |
+| `POST /api/alerty/przeczytane` | oznacza zmiany jako przeczytane (tylko administrator) |
+| `DELETE /api/alerty/{id}` | usuwa alert (tylko administrator) |
 
 Przykład startu wyszukiwania dwóch rozmiarów w dwóch źródłach:
 

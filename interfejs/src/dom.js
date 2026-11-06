@@ -56,3 +56,12 @@ export function odmiana(liczba, jeden, kilka, wiele) {
   const reszta100 = liczba % 100;
   return reszta10 >= 2 && reszta10 <= 4 && (reszta100 < 12 || reszta100 > 14) ? kilka : wiele;
 }
+
+export function bezpiecznyAdres(adres) {
+  try {
+    const url = new URL(adres);
+    return url.protocol === "https:" || url.protocol === "http:" ? url.href : null;
+  } catch {
+    return null;
+  }
+}

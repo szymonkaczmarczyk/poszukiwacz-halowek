@@ -6,7 +6,7 @@
 <meta name="color-scheme" content="dark">
 <meta name="theme-color" content="#0e0e10">
 <title>Logowanie administratora - Szatnia</title>
-<meta name="description" content="Logowanie administratora Szatni. Tylko administrator dodaje i usuwa własne modele butów.">
+<meta name="description" content="Logowanie administratora Szatni. Tylko administrator dodaje własne modele butów i zapisuje alerty o ofertach.">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
@@ -19,7 +19,7 @@
 </header>
 <main class="tekst-prawny logowanie">
   <h1>Logowanie administratora</h1>
-  <p id="logowanie-opis">Po zalogowaniu w kroku „Model” pojawi się przycisk „Dodaj własny model”.</p>
+  <p id="logowanie-opis">Po zalogowaniu w kroku „Model” pojawi się przycisk „Dodaj własny model”, a po wyszukiwaniu przycisk „Powiadamiaj o nowych i tańszych”.</p>
   <form class="logowanie__forma" id="logowanie" novalidate>
     <div class="pole-formularza">
       <label class="pole-formularza__etykieta" for="haslo">Hasło</label>
@@ -32,6 +32,7 @@
     <p>Jesteś zalogowany jako administrator.</p>
     <div class="blad-404__akcje">
       <a class="przycisk przycisk--glowny" href="/#krok-model">Przejdź do modeli<span data-ikona="ArrowRight"></span></a>
+      <a class="przycisk" href="/alerty.html"><span data-ikona="Bell"></span>Alerty o ofertach</a>
       <button class="przycisk" type="button" id="wyloguj">Wyloguj się</button>
     </div>
   </div>
