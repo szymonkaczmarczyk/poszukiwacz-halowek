@@ -17,9 +17,45 @@ Domyślnie program szuka Munich Continental w rozmiarze 41.
 
 ## Uruchomienie
 
+Wyszukiwarkę obsługujesz przez stronę w przeglądarce (Szatnia): klikasz markę, model, rozmiar i filtry, a wyniki spływają na żywo. Potrzebne są Python 3.12 i Node.js 20 lub nowszy.
+
+**Pierwsze uruchomienie.** W terminalu przejdź do folderu projektu i wpisz po kolei:
+
 ```bash
 py -m pip install -r requirements.txt
 ```
+
+```bash
+py -m playwright install chromium
+```
+
+```bash
+npm --prefix interfejs install
+```
+
+```bash
+npm --prefix interfejs run build
+```
+
+```bash
+py serwer.py
+```
+
+Gdy serwer działa, otwórz w przeglądarce `http://127.0.0.1:8765`. Terminal zostaw otwarty. Żeby zatrzymać serwer, wciśnij w nim Ctrl+C.
+
+**Kolejne uruchomienia.** Wystarczy w folderze projektu jedno polecenie, a potem wejście na `http://127.0.0.1:8765`:
+
+```bash
+py serwer.py
+```
+
+Interfejs trzeba zbudować ponownie (`npm --prefix interfejs run build`) tylko po zmianach w `interfejs/` albo po pobraniu nowej wersji projektu.
+
+Więcej o tym, co potrafi interfejs, w sekcji [Interfejs w przeglądarce (Szatnia)](#interfejs-w-przeglądarce-szatnia).
+
+### Z terminala, bez strony
+
+To samo wyszukiwanie można uruchomić bez interfejsu. Wystarczą dwa pierwsze polecenia z pierwszego uruchomienia.
 
 ```bash
 py szukaj.py
@@ -147,27 +183,7 @@ Własny model spoza katalogu dodasz przyciskiem „Dodaj własny model” w krok
 
 Wybór jest zapisany w adresie strony, np. `?marka=nike&model=tiempo&rozmiar=43,44`, więc link otwiera od razu ten model i rozmiary.
 
-**Najprościej (jeden serwer):** zbuduj interfejs raz, a potem uruchamiaj tylko serwer. Strona będzie pod `http://127.0.0.1:8765`.
-
-```bash
-cd interfejs
-```
-
-```bash
-npm install
-```
-
-```bash
-npm run build
-```
-
-```bash
-cd ..
-```
-
-```bash
-py serwer.py
-```
+Jak uruchomić stronę, opisuje sekcja [Uruchomienie](#uruchomienie).
 
 **Przy pracy nad interfejsem** (podgląd zmian na żywo) wymagany jest Node.js 20 lub nowszy. Najpierw uruchom serwer API, a potem w drugim terminalu:
 

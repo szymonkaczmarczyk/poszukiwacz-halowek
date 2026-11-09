@@ -20,9 +20,48 @@ By default the program searches for Munich Continental in size 41.
 
 ## Getting started
 
+You use the finder through a browser page (Szatnia): you click the brand, model, size and filters, and results come in
+live. You need Python 3.12 and Node.js 20 or newer.
+
+**First run.** In a terminal, go to the project folder and run, one after another:
+
 ```bash
 py -m pip install -r requirements.txt
 ```
+
+```bash
+py -m playwright install chromium
+```
+
+```bash
+npm --prefix interfejs install
+```
+
+```bash
+npm --prefix interfejs run build
+```
+
+```bash
+py serwer.py
+```
+
+Once the server is running, open `http://127.0.0.1:8765` in your browser. Leave the terminal open. To stop the server,
+press Ctrl+C in it.
+
+**Next runs.** One command in the project folder is enough, then open `http://127.0.0.1:8765`:
+
+```bash
+py serwer.py
+```
+
+You only need to rebuild the interface (`npm --prefix interfejs run build`) after changes in `interfejs/` or after
+pulling a new version of the project.
+
+More about what the interface can do in [Browser interface (Szatnia)](#browser-interface-szatnia).
+
+### From the terminal, without the page
+
+The same search can run without the interface. The first two commands from the first run are enough.
 
 ```bash
 py szukaj.py
@@ -193,28 +232,7 @@ dialog, with confirmation.
 The selection is stored in the page URL, e.g. `?marka=nike&model=tiempo&rozmiar=43,44`, so a link opens that model and
 those sizes right away.
 
-**The simplest way (one server):** build the interface once, then run only the server. The page will be at
-`http://127.0.0.1:8765`.
-
-```bash
-cd interfejs
-```
-
-```bash
-npm install
-```
-
-```bash
-npm run build
-```
-
-```bash
-cd ..
-```
-
-```bash
-py serwer.py
-```
+How to start the page is described in [Getting started](#getting-started).
 
 **When working on the interface** (live preview of changes) you need Node.js 20 or newer. Start the API server first,
 then in a second terminal:
