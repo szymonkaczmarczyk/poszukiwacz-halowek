@@ -57,7 +57,7 @@ export function pasek({ element, wybor, brak, przycisk, skrot, kotwica }, katalo
     if (stan.tylkoPewne) szczegoly.push("tylko pewne");
     if (stan.pominieteZrodla.length) szczegoly.push(`bez ${stan.pominieteZrodla.length} źródeł`);
     return [
-      el("span", { class: "pasek__model" }, model ? model.nazwa : marka ? marka.nazwa : "Nic jeszcze nie wybrano"),
+      el("span", { class: "pasek__model" }, model ? model.nazwa : marka ? marka.nazwa : "Nic nie wybrano"),
       szczegoly.length > 0 && el("span", { class: "pasek__szczegol" }, szczegoly.join(" · ")),
     ];
   }
@@ -66,7 +66,8 @@ export function pasek({ element, wybor, brak, przycisk, skrot, kotwica }, katalo
     const stan = pobierz();
     const braki = brakujace(stan);
     wyczysc(wybor, opis(stan));
-    wyczysc(brak, braki.length ? [ikona("TriangleAlert"), braki.map((b) => b.tekst).join(", ")] : []);
+    const [pierwszy, ...reszta] = braki.map((b, i) => (i ? b.tekst.charAt(0).toLowerCase() + b.tekst.slice(1) : b.tekst));
+    wyczysc(brak, braki.length ? [ikona("TriangleAlert"), el("span", { class: "pasek__brak-tekst" }, pierwszy, reszta.length > 0 && el("span", { class: "pasek__brak-reszta" }, `, ${reszta.join(", ")}`))] : []);
     const zablokowany = trwa || braki.length > 0;
     przycisk.setAttribute("aria-disabled", String(zablokowany));
     if (braki.length) przycisk.setAttribute("aria-describedby", "pasek-brak");

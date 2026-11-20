@@ -43,7 +43,7 @@ function uporzadkujStan(katalog) {
 function pokazLiczby(katalog) {
   $("liczba-marek").textContent = katalog.marki.length;
   $("liczba-modeli").textContent = katalog.marki.reduce((suma, m) => suma + m.modele.length, 0);
-  $("zakres-rozmiarow").textContent = `${katalog.rozmiary[0]}–${katalog.rozmiary.at(-1)}`;
+  $("zakres-rozmiarow").textContent = `${katalog.rozmiary[0]}-${katalog.rozmiary.at(-1)}`;
   $("hero-liczby").hidden = false;
 }
 

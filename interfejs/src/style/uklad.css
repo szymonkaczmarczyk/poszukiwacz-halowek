@@ -42,7 +42,7 @@ main {
   flex-direction: column;
   justify-content: flex-end;
   gap: var(--odstep-5);
-  padding: calc(var(--wysokosc-naglowka) + 44svh) 0 var(--odstep-8);
+  padding: calc(var(--wysokosc-naglowka) + 44svh) 0 var(--odstep-6);
 }
 
 .krok,
@@ -51,7 +51,7 @@ main {
   display: flex;
   flex-direction: column;
   gap: var(--odstep-4);
-  padding: var(--odstep-9) 0 var(--odstep-6);
+  padding: var(--odstep-8) 0 var(--odstep-6);
 }
 
 .krok > h2,
@@ -83,10 +83,11 @@ main {
   right: var(--odstep-3);
   bottom: calc(var(--odstep-3) + env(safe-area-inset-bottom));
   display: grid;
-  grid-template-columns: 1fr;
-  gap: var(--odstep-3);
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas: "wybor przycisk" "brak przycisk";
+  gap: var(--odstep-1) var(--odstep-3);
   align-items: center;
-  padding: var(--odstep-3);
+  padding: var(--odstep-2) var(--odstep-2) var(--odstep-2) var(--odstep-4);
   background: rgb(26 26 30 / 0.92);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
@@ -117,9 +118,6 @@ main {
     left: 50%;
     right: auto;
     width: min(880px, calc(100% - var(--odstep-7)));
-    grid-template-columns: 1fr auto;
-    grid-template-areas: "wybor przycisk" "brak przycisk";
-    row-gap: var(--odstep-1);
     padding: var(--odstep-3) var(--odstep-3) var(--odstep-3) var(--odstep-5);
     transform: translate(-50%, calc(100% + var(--odstep-6)));
   }
@@ -144,6 +142,8 @@ main {
   .krok {
     min-height: 100svh;
     justify-content: center;
+    padding-top: var(--odstep-9);
+    padding-bottom: calc(var(--wysokosc-paska) + var(--odstep-7));
   }
 
   .scena {

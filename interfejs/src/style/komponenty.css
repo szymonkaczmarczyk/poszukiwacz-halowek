@@ -483,12 +483,42 @@
 }
 
 .pasek__brak svg.lucide {
+  flex: none;
   width: 16px;
   height: 16px;
 }
 
+@media (max-width: 767px) {
+  .pasek__wybor {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .pasek__model,
+  .pasek__szczegol,
+  .pasek__brak-tekst {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .pasek__brak-reszta {
+    display: none;
+  }
+}
+
+.pasek__wybor {
+  grid-area: wybor;
+}
+
+.pasek__brak {
+  grid-area: brak;
+}
+
 .pasek .przycisk--glowny {
-  width: 100%;
+  grid-area: przycisk;
 }
 
 .szyna ol {
@@ -682,15 +712,35 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .pasek .przycisk--glowny {
-    width: auto;
-  }
-
 }
 
 @media (min-width: 1280px) {
   .siatka-marek {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .siatka-marek .wybor {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--odstep-3);
+  }
+
+  .siatka-marek .monogram {
+    width: 48px;
+    height: 48px;
+  }
+
+  .siatka-marek .wybor__tresc {
+    padding-right: 0;
+  }
+
+  .siatka-marek .wybor__meta {
+    white-space: nowrap;
+  }
+
+  .siatka-marek .wybor__znak {
+    top: var(--odstep-4);
+    margin-top: 0;
   }
 
   .szyna__nazwa {
@@ -734,20 +784,6 @@
   animation: obrot 1s linear infinite;
 }
 
-@media (min-width: 768px) {
-  .pasek__wybor {
-    grid-area: wybor;
-  }
-
-  .pasek__brak {
-    grid-area: brak;
-  }
-
-  .pasek .przycisk--glowny {
-    grid-area: przycisk;
-  }
-}
-
 @container krok (min-width: 600px) {
   .rozmiary {
     grid-template-columns: repeat(9, minmax(0, 1fr));
@@ -764,7 +800,7 @@
   }
 }
 
-@media (hover: none) {
+@media (hover: none), (max-width: 767px) {
   .skrot {
     display: none;
   }
@@ -780,6 +816,13 @@
 
 .scena[data-tryb="3d"] .scena__but {
   display: none;
+}
+
+@media (min-width: 1024px) {
+  .scena__plotno {
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 16%);
+    mask-image: linear-gradient(to right, transparent, #000 16%);
+  }
 }
 
 .postep__akcje {

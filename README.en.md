@@ -18,6 +18,11 @@ holds indoor football shoes (Polish: *halówki*) from six brands:
 
 By default the program searches for Munich Continental in size 41.
 
+![Szatnia, the start page with a 3D shoe and the "Wybierz but" (choose a shoe) button](docs/zrzuty/start.jpg)
+
+The screenshots show the stylized shoe drawn in code and sample results (demo data). The real 3D models are made from
+shop photos, so they stay on the owner's computer only.
+
 ## Getting started
 
 You use the finder through a browser page (Szatnia): you click the brand, model, size and filters, and results come in
@@ -201,6 +206,10 @@ summary and a "Search offers" button is pinned to the bottom of the screen (shor
 the filters the bar smoothly docks into the page as a normal element, and after scrolling up it returns to the bottom
 of the screen. Your selection stays in the browser after a refresh.
 
+| Brand | Size, with a ruler in the scene |
+|---|---|
+| ![Brand step with Joma selected](docs/zrzuty/marka.jpg) | ![Size step with sizes 41 and 42 selected and a ruler under the shoe](docs/zrzuty/rozmiar.jpg) |
+
 Several sizes at once are consecutive passes of the same search. Most pages from the first pass are already cached, so
 the second size runs several times faster (in a test: 42 in 35 s, 43 in 10 s).
 
@@ -213,6 +222,16 @@ Results come in three groups (confirmed size, size to check, model to check in t
 source filter, sorting and pagination by 12. Above the list there is a "Since the last check" block (new, cheaper, more
 expensive, gone), and cards have "new" and "PLN X cheaper" badges. The "Hide" button hides an offer right away and saves
 it to `ukryte.txt`, and a notification lets you undo it. At the end there are links to pages you need to check by hand.
+
+![Results for Joma Top Flex: size tabs, changes since the last check and offer cards (demo data)](docs/zrzuty/wyniki.jpg)
+
+On a phone the scene sits above the content, and the bar shows only the next missing step:
+
+<p>
+  <img src="docs/zrzuty/telefon-start.jpg" width="250" alt="Start page on a phone">
+  <img src="docs/zrzuty/telefon-rozmiar.jpg" width="250" alt="Size step on a phone with the search bar">
+  <img src="docs/zrzuty/telefon-wyniki.jpg" width="250" alt="Results on a phone (demo data)">
+</p>
 
 Only the administrator can add custom models. First set a password (stored as an argon2 hash in `.env`):
 
@@ -272,8 +291,9 @@ Instead of the stylized shoe the scene can show a real model. All it needs is an
 `interfejs/public/modele/<brand>-<model>.glb` file, e.g. `munich-continental.glb`. These files are in `.gitignore`
 because they are made from private photos. The server detects the file on its own, and the scene loads it after that
 model is selected. The program positions the shoe itself: rotates it lengthwise, scales it to the length of a size 42,
-puts it on the floor and flips it if the heel ended up in front. Models without a file and broken files get the
-stylized shoe.
+puts it on the floor and flips it if the heel ended up in front. It also removes stray fragments the generator leaves
+next to the shoe: separate mesh pieces longer than 10% of the shoe that stick out past its outline. Models without a
+file and broken files get the stylized shoe.
 
 The model is made from your photos (an AI generator). How to take them:
 

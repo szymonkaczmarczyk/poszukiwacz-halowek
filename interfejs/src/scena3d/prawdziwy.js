@@ -27,7 +27,72 @@ function pietaZPrzodu(punkty) {
   return przod.length > 0 && tyl.length > 0 && najwyzej(przod) > najwyzej(tyl);
 }
 
+const DOKLADNOSC_SCALANIA = 20000;
+const MIN_DLUGOSC_ODPRYSKU = 0.1;
+const ZAPAS_OBRYSU = 0.03;
+
+function skladowe(geometria) {
+  const pozycje = geometria.attributes.position;
+  const indeks = geometria.index;
+  const trojkaty = (indeks ? indeks.count : pozycje.count) / 3;
+  const wierzcholek = (t, k) => (indeks ? indeks.getX(t * 3 + k) : t * 3 + k);
+  geometria.computeBoundingBox();
+  const krok = geometria.boundingBox.getSize(new THREE.Vector3()).length() / DOKLADNOSC_SCALANIA || 1;
+  const klucze = new Map();
+  const rodzic = new Int32Array(pozycje.count);
+  for (let i = 0; i < pozycje.count; i++) {
+    const klucz = `${Math.round(pozycje.getX(i) / krok)},${Math.round(pozycje.getY(i) / krok)},${Math.round(pozycje.getZ(i) / krok)}`;
+    if (!klucze.has(klucz)) klucze.set(klucz, i);
+    rodzic[i] = klucze.get(klucz);
+  }
+  const korzen = (x) => {
+    while (rodzic[x] !== x) {
+      rodzic[x] = rodzic[rodzic[x]];
+      x = rodzic[x];
+    }
+    return x;
+  };
+  for (let t = 0; t < trojkaty; t++) {
+    const a = korzen(wierzcholek(t, 0));
+    for (const k of [1, 2]) {
+      const b = korzen(wierzcholek(t, k));
+      if (b !== a) rodzic[b] = a;
+    }
+  }
+  const grupy = new Map();
+  const punkt = new THREE.Vector3();
+  for (let t = 0; t < trojkaty; t++) {
+    const id = korzen(wierzcholek(t, 0));
+    if (!grupy.has(id)) grupy.set(id, { trojkaty: [], obrys: new THREE.Box3() });
+    const grupa = grupy.get(id);
+    grupa.trojkaty.push(t);
+    for (const k of [0, 1, 2]) grupa.obrys.expandByPoint(punkt.fromBufferAttribute(pozycje, wierzcholek(t, k)));
+  }
+  return { grupy: [...grupy.values()], wierzcholek };
+}
+
+function usunOdpryski(geometria) {
+  const { grupy, wierzcholek } = skladowe(geometria);
+  if (grupy.length < 2) return;
+  grupy.sort((a, b) => b.trojkaty.length - a.trojkaty.length);
+  const glowny = grupy[0].obrys;
+  const dlugosc = (obrys) => Math.max(...obrys.getSize(new THREE.Vector3()).toArray());
+  const zasieg = dlugosc(glowny);
+  const dozwolony = glowny.clone().expandByScalar(zasieg * ZAPAS_OBRYSU);
+  const odpryski = grupy.filter((g) => dlugosc(g.obrys) > zasieg * MIN_DLUGOSC_ODPRYSKU && !dozwolony.containsBox(g.obrys));
+  if (!odpryski.length) return;
+  const zostaja = grupy.filter((g) => !odpryski.includes(g));
+  const nowyIndeks = [];
+  for (const g of zostaja) for (const t of g.trojkaty) nowyIndeks.push(wierzcholek(t, 0), wierzcholek(t, 1), wierzcholek(t, 2));
+  geometria.setIndex(nowyIndeks);
+  geometria.computeBoundingBox();
+  geometria.computeBoundingSphere();
+}
+
 function wyrownaj(scena) {
+  scena.traverse((dziecko) => {
+    if (dziecko.isMesh) usunOdpryski(dziecko.geometry);
+  });
   const opakowanie = new THREE.Group();
   const korzen = new THREE.Group();
   korzen.add(scena);

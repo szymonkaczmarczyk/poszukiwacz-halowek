@@ -50,7 +50,7 @@ test("strona startowa pokazuje dane z katalogu i CTA", async ({ page }) => {
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("Halówki w Twoim rozmiarze, od najtańszej oferty");
   await expect(page.locator("#liczba-marek")).toHaveText("6");
   await expect(page.locator("#liczba-modeli")).toHaveText("24");
-  await expect(page.locator("#zakres-rozmiarow")).toHaveText("38–46");
+  await expect(page.locator("#zakres-rozmiarow")).toHaveText("38-46");
   await expect(page.getByRole("link", { name: "Wybierz but" })).toBeVisible();
   await expect(page.getByRole("radio")).toHaveCount(6);
 });
@@ -165,7 +165,7 @@ test("nieznany model z adresu nie jest wybierany", async ({ page }) => {
   await page.goto("/?marka=nike&model=nie-ma-takiego&rozmiar=99");
   await expect(page.locator("#status-api")).toHaveAttribute("data-stan", "ok");
   await expect(page.locator("#pasek-brak")).toContainText("Wybierz model");
-  await expect(page.locator("#pasek-brak")).toContainText("Zaznacz rozmiar");
+  await expect(page.locator("#pasek-brak")).toContainText("zaznacz rozmiar");
 });
 
 test("pasek z przyciskiem szukania wsiada w stronę na końcu filtrów i wraca przy przewijaniu w górę", async ({ page }) => {

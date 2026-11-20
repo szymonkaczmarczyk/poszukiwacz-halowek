@@ -7,14 +7,22 @@ export function scena(katalog) {
   const marka = document.getElementById("scena-marka");
   const model = document.getElementById("scena-model");
   const rozmiar = document.getElementById("scena-rozmiar");
+  const modele = katalog.marki.flatMap((m) => m.modele);
+  let podglad = null;
+
+  function dopisek(stan, znaleziony) {
+    if (stan.rozmiary.length) return `rozm. ${stan.rozmiary.join(", ")}`;
+    if (znaleziony) return "wybierz rozmiar";
+    return podglad ? `na podglądzie ${podglad.nazwa}` : "";
+  }
 
   function ustaw(stan, animuj) {
     const znaleziona = katalog.marki.find((m) => m.id === stan.marka);
     const znaleziony = znaleziona?.modele.find((m) => m.id === stan.model);
     const zmiany = () => {
       marka.textContent = znaleziona ? znaleziona.nazwa : "Szatnia";
-      model.textContent = znaleziony ? znaleziony.nazwa : znaleziona ? "Wybierz model" : "Wybierz but";
-      rozmiar.textContent = stan.rozmiary.length ? `rozm. ${stan.rozmiary.join(", ")}` : "";
+      model.textContent = znaleziony ? znaleziony.nazwa : znaleziona ? "Wybierz model" : "Wybierz markę";
+      rozmiar.textContent = dopisek(stan, znaleziony);
       korzen.dataset.wybrany = String(Boolean(znaleziony));
     };
     if (!animuj || ograniczonyRuch()) {
@@ -35,6 +43,10 @@ export function scena(katalog) {
   }
 
   ustaw(pobierz(), false);
+  document.addEventListener("szatnia:podglad", ({ detail: { adres } }) => {
+    podglad = (adres && modele.find((m) => m.model3d === adres)) || null;
+    ustaw(pobierz(), false);
+  });
   subskrybuj((stan, poprzedni) => {
     if (stan.marka !== poprzedni.marka || stan.model !== poprzedni.model) ustaw(stan, true);
     else if (stan.rozmiary !== poprzedni.rozmiary) ustaw(stan, false);

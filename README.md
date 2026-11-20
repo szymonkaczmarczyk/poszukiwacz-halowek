@@ -15,6 +15,10 @@ Co szukać, wybierasz z **katalogu modeli** (`katalog/`): marka, model i rozmiar
 
 Domyślnie program szuka Munich Continental w rozmiarze 41.
 
+![Szatnia, strona startowa wyszukiwarki z butem 3D i przyciskiem „Wybierz but”](docs/zrzuty/start.jpg)
+
+Zrzuty ekranu pokazują stylizowany but rysowany kodem i przykładowe wyniki (dane demo). Prawdziwe modele 3D powstają ze zdjęć sklepów, więc zostają tylko na komputerze właściciela.
+
 ## Uruchomienie
 
 Wyszukiwarkę obsługujesz przez stronę w przeglądarce (Szatnia): klikasz markę, model, rozmiar i filtry, a wyniki spływają na żywo. Potrzebne są Python 3.12 i Node.js 20 lub nowszy.
@@ -165,11 +169,25 @@ Każdy model ma osobną historię cen, odkryte sklepy i statystyki źródeł (`d
 
 Szatnia prowadzi przez cztery kroki: marka, model, rozmiar (można kilka) i filtry (cena z progami 200, 300, 400 i 500 zł, tylko potwierdzony rozmiar, świeże dane, wybór źródeł). Podczas przewijania na dole ekranu jest przypięty pasek z podsumowaniem i przyciskiem „Szukaj ofert” (skrót Ctrl ↵, na Macu ⌘ ↵). Na końcu filtrów pasek płynnie wsiada w stronę jako jej zwykły element, a po przewinięciu w górę wraca na dół ekranu. Wybór zostaje w przeglądarce po odświeżeniu strony.
 
+| Marka | Rozmiar z miarką na scenie |
+|---|---|
+| ![Krok wyboru marki z zaznaczoną marką Joma](docs/zrzuty/marka.jpg) | ![Krok wyboru rozmiaru z zaznaczonymi rozmiarami 41 i 42 i miarką pod butem](docs/zrzuty/rozmiar.jpg) |
+
 Kilka rozmiarów naraz to kolejne przejścia tego samego wyszukiwania. Większość stron z pierwszego przejścia jest już w pamięci podręcznej, więc drugi rozmiar idzie kilka razy szybciej (w teście: 42 w 35 s, 43 w 10 s).
 
 W trakcie szukania widać pasek postępu, stan każdego źródła i oferty, które spływają od razu, gdy źródło skończy. W scenie 3D każde źródło to świecąca kula na orbicie wokół buta: pulsuje, gdy trwa sprawdzanie, a potem zmienia kolor (zielony gotowe, żółty wstrzymane lub podejrzane, czerwony błąd). „Przerwij szukanie” (albo Esc) zatrzymuje wszystko w około sekundę, także w trakcie odstępów między zapytaniami. Wyniki ze źródeł, które zdążyły, zostają zapisane.
 
 Wyniki są w trzech grupach (potwierdzony rozmiar, rozmiar do sprawdzenia, model do sprawdzenia na zdjęciu), z zakładką dla każdego rozmiaru, filtrem źródła, sortowaniem i stronicowaniem po 12. Nad listą jest blok „Od ostatniego sprawdzenia” (nowe, tańsze, droższe, które zniknęły), a karty mają znaczki „nowa” i „taniej o X zł”. Przycisk „Ukryj” chowa ofertę od razu i zapisuje ją w `ukryte.txt`, a powiadomienie pozwala to cofnąć. Na końcu są linki do stron, które trzeba sprawdzić ręcznie.
+
+![Wyniki dla Joma Top Flex: zakładki rozmiarów, zmiany od ostatniego sprawdzenia i karty ofert (dane demo)](docs/zrzuty/wyniki.jpg)
+
+Na telefonie scena stoi nad treścią, a pasek pokazuje tylko następny brakujący krok:
+
+<p>
+  <img src="docs/zrzuty/telefon-start.jpg" width="250" alt="Strona startowa na telefonie">
+  <img src="docs/zrzuty/telefon-rozmiar.jpg" width="250" alt="Krok rozmiaru na telefonie z paskiem „Szukaj ofert”">
+  <img src="docs/zrzuty/telefon-wyniki.jpg" width="250" alt="Wyniki na telefonie (dane demo)">
+</p>
 
 Własne modele dodaje tylko administrator. Najpierw ustaw hasło (zapisuje się jako skrót argon2 w `.env`):
 
@@ -211,7 +229,7 @@ Obok kroków stoi scena 3D (Three.js): stylizowany but zbudowany w kodzie, bez c
 
 Scena pokazuje prawdziwe modele: na starcie losowy, po wyborze marki losowy z tej marki, a po wyborze linii jej własny model. But stylizowany zostaje tylko wtedy, gdy nie ma żadnego pliku GLB (np. w świeżej kopii repozytorium).
 
-Zamiast stylizowanego buta scena może pokazać prawdziwy model. Wystarczy plik `interfejs/public/modele/<marka>-<model>.glb`, np. `munich-continental.glb`. Te pliki są w `.gitignore`, bo powstają z prywatnych zdjęć. Serwer sam go wykryje, a scena wczyta go po wybraniu tego modelu. Program sam ustawia but: obraca go wzdłuż, skaluje do długości rozmiaru 42, stawia na podłodze i odwraca, jeśli pięta wypadła z przodu. Modele bez pliku i uszkodzone pliki dostają but stylizowany.
+Zamiast stylizowanego buta scena może pokazać prawdziwy model. Wystarczy plik `interfejs/public/modele/<marka>-<model>.glb`, np. `munich-continental.glb`. Te pliki są w `.gitignore`, bo powstają z prywatnych zdjęć. Serwer sam go wykryje, a scena wczyta go po wybraniu tego modelu. Program sam ustawia but: obraca go wzdłuż, skaluje do długości rozmiaru 42, stawia na podłodze i odwraca, jeśli pięta wypadła z przodu. Usuwa też odpryski, które generator zostawia obok buta: oddzielne kawałki siatki dłuższe niż 10% buta i wystające poza jego obrys. Modele bez pliku i uszkodzone pliki dostają but stylizowany.
 
 Model powstaje z Twoich zdjęć (generator AI). Jak je zrobić:
 

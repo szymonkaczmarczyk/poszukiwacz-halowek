@@ -15,7 +15,7 @@ const UJECIA = {
   hero: { kierunek: [3.4, 1.75, 3.9], cel: [0.05, 0.34, 0], kadr: 1.05, obrot: -0.45, krecenie: true },
   marka: { kierunek: [0.05, 0.28, 1], cel: [0.05, 0.36, 0], kadr: 1.02, obrot: 0 },
   model: { kierunek: [3, 1.3, 2.5], cel: [0.3, 0.32, 0], kadr: 0.92, obrot: 0.25 },
-  rozmiar: { kierunek: [0.05, 2.4, 0.7], cel: [1.1, 0.05, 0.6], kadr: 0.4, obrot: 0, miarka: true },
+  rozmiar: { kierunek: [0.05, 2.4, 0.7], cel: [1.1, 0.05, 0.28], kadr: 0.6, obrot: 0, miarka: true },
   filtry: { kierunek: [-3.3, 1.55, 3.1], cel: [0, 0.34, 0], kadr: 1.02, obrot: -0.2 },
   postep: { kierunek: [3.2, 2.6, 4.7], cel: [0, 0.5, 0], kadr: 1.5, obrot: 0.6, krecenie: true },
 };
@@ -182,7 +182,12 @@ export function uruchomScene3d(kontener, katalog) {
     gsap.to(obiekt.scale, { x: 0.001, y: 0.001, z: 0.001, duration: 0.3, ease: "power2.in", onUpdate: obudz, onComplete: () => (obiekt.visible = false) });
   }
 
+  function oglosPodglad(adres) {
+    document.dispatchEvent(new CustomEvent("szatnia:podglad", { detail: { adres } }));
+  }
+
   function pokazStylizowany() {
+    oglosPodglad(null);
     if (prawdziwy?.visible) pokaz(prawdziwy, false);
     if (!but.visible || but.scale.x < 1) pokaz(but, true);
     kontener.dataset.model3d = "stylizowany";
@@ -210,6 +215,7 @@ export function uruchomScene3d(kontener, katalog) {
       pokaz(obiekt, true);
       pokazanyAdres = adres;
       kontener.dataset.model3d = "prawdziwy";
+      oglosPodglad(adres);
     } catch {
       if (zadanyAdres === adres) pokazStylizowany();
     }
